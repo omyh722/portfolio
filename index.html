@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المحفظة المشتركة — المحفظة المشتركة</title>
+<link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+::selection{background:rgba(79,224,171,.25)}
+body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:#091317;color:#EAF3F4;min-height:100vh;-webkit-font-smoothing:antialiased}
+.page{display:none!important}
+.page.active{display:flex!important;flex-direction:column;min-height:100vh}
+#page-member.active,#page-admin.active{flex-direction:row}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:6px}
+
+/* LOGIN */
+#page-login{align-items:center;justify-content:center;background:radial-gradient(ellipse 80% 60% at 60% -10%,rgba(79,224,171,.1),transparent 55%),radial-gradient(ellipse 60% 50% at 5% 5%,rgba(88,185,242,.07),transparent 50%)}
+.login-card{background:#0E1D24;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 32px;width:100%;max-width:360px}
+.login-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px}
+.login-logo span{font-family:'El Messiri',serif;font-size:26px;font-weight:700}
+.login-title{text-align:center;margin-bottom:4px;font-family:'El Messiri',serif;font-size:20px;font-weight:600}
+.login-sub{text-align:center;font-size:13px;color:#8DA2AA;margin-bottom:24px}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:24px;height:20px;align-items:center}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.2);background:transparent;transition:all .15s}
+.pin-dot.filled{background:#4FE0AB;border-color:#4FE0AB;box-shadow:0 0 8px rgba(79,224,171,.5)}
+.pin-dot.error{background:#F2829A!important;border-color:#F2829A!important;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.pin-key{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:15px 8px;font-family:inherit;font-size:22px;font-weight:600;color:#EAF3F4;cursor:pointer;transition:all .12s;text-align:center;line-height:1}
+.pin-key:hover{background:rgba(79,224,171,.1);border-color:rgba(79,224,171,.4);color:#4FE0AB}
+.pin-key:active{transform:scale(.93)}
+.pin-key.del{font-size:15px;color:#8DA2AA}
+.pin-key.empty{visibility:hidden;pointer-events:none}
+.login-hint{text-align:center;font-size:12px;color:#6E848C;margin-top:8px}
+.login-demo{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);font-size:12px;color:#6E848C;text-align:center}
+.demo-btns{display:flex;gap:8px;margin-top:8px}
+.demo-btn{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9CB1B9;font-family:inherit;font-size:12px;cursor:pointer;transition:border-color .2s}
+.demo-btn:hover{border-color:rgba(255,255,255,.3);color:#EAF3F4}
+
+/* SHELL */
+#page-member,#page-admin{flex-direction:row;min-height:100vh}
+.sidebar{width:252px;flex-shrink:0;background:#0B181E;border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;padding:22px 16px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-logo{display:flex;align-items:center;gap:9px;padding:4px 8px 24px}
+.sb-logo span{font-family:'El Messiri',serif;font-size:22px;font-weight:700}
+.sb-nav{display:flex;flex-direction:column;gap:3px;flex:1}
+.sb-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;font-size:14px;color:#9CB1B9;cursor:pointer;transition:all .15s;user-select:none}
+.sb-item:hover{background:rgba(255,255,255,.04);color:#EAF3F4}
+.sb-item.active{background:rgba(79,224,171,.12);color:#4FE0AB;font-weight:600}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:#3A4F58;flex-shrink:0;transition:background .15s}
+.sb-item.active .sb-dot{background:#4FE0AB}
+.sb-divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
+.sb-back{display:flex;align-items:center;gap:8px;padding:10px 13px;border-radius:11px;font-size:13px;color:#6E848C;cursor:pointer;transition:color .15s}
+.sb-back:hover{color:#EAF3F4}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 8px 4px;border-top:1px solid rgba(255,255,255,.06);margin-top:8px}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4FE0AB,#58B9F2);display:flex;align-items:center;justify-content:center;color:#06181A;font-weight:700;font-size:14px;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:600}
+.sb-urole{font-size:11px;color:#8DA2AA}
+
+/* MAIN */
+.main{flex:1;min-width:0;overflow-y:auto;background:#091317}
+.topbar{padding:22px 30px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.topbar-title{font-family:'El Messiri',serif;font-size:24px;font-weight:600}
+.topbar-sub{font-size:13px;color:#8DA2AA;margin-top:3px}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,.12);border-radius:11px;font-size:13px;color:#C3D2D7}
+.btn-grad{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A;border:none;padding:9px 18px;border-radius:11px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.content{padding:26px 30px 60px}
+.section{display:none}
+.section.active{display:block}
+
+/* INNER TABS */
+.inner-tabs{display:flex;gap:0;margin-bottom:20px;background:rgba(255,255,255,.04);border-radius:12px;padding:4px}
+.inner-tab{flex:1;padding:9px;text-align:center;border-radius:9px;font-size:13px;color:#8DA2AA;cursor:pointer;transition:all .15s;font-family:inherit;border:none;background:transparent}
+.inner-tab.active{background:#0E1D24;color:#EAF3F4;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.inner-section{display:none}
+.inner-section.active{display:block}
+
+/* CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.kpi{background:#0E1D24;border:1px solid rgba(255,255,255,.07);border-radius:17px;padding:20px}
+.kpi.highlight{background:linear-gradient(160deg,rgba(88,185,242,.12),#0E1D24);border-color:rgba(88,185,242,.3)}
+.kpi-label{font-size:12px;color:#8DA2AA;margin-bottom:10px}
+.kpi-val{font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.kpi-unit{font-size:13px;color:#8DA2AA;font-weight:400}
+.kpi-change{margin-top:8px;font-size:12px;font-weight:600}
+.kpi-change.up{color:#4FE0AB}
+.kpi-change.blue{color:#58B9F2}
+.two-col{display:grid;grid-template-columns:1.65fr 1fr;gap:16px;margin-bottom:20px}
+.card{background:#0E1D24;border:1px solid rgba(255,255,255,.07);border-radius:17px;padding:22px}
+.card-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.card-sub{font-size:12px;color:#8DA2AA}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.tabs{display:flex;gap:6px}
+.tab{padding:6px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:transparent;font-family:inherit;font-size:12px;color:#8DA2AA;cursor:pointer;transition:all .15s}
+.tab.active{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A;border-color:transparent;font-weight:600}
+.chart-wrap{position:relative;height:200px;margin-top:8px}
+.chart-labels{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:#8DA2AA}
+.alloc-row{margin-bottom:16px}
+.alloc-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.alloc-name{color:#C3D2D7}
+.alloc-pct{color:#8DA2AA}
+.alloc-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.06)}
+.alloc-fill{height:6px;border-radius:99px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead td{padding:12px 8px;color:#8DA2AA;font-size:12px;font-weight:500}
+tbody tr{border-top:1px solid rgba(255,255,255,.05)}
+tbody tr.me{background:rgba(88,185,242,.05);border-top-color:rgba(79,224,171,.2)}
+tbody td{padding:13px 8px;color:#C3D2D7}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
+.badge.buy{background:rgba(79,224,171,.12);color:#4FE0AB}
+.badge.sell{background:rgba(88,185,242,.12);color:#58B9F2}
+.badge.call{background:rgba(79,224,171,.15);color:#4FE0AB}
+.badge.put{background:rgba(242,130,154,.15);color:#F2829A}
+.pos{color:#4FE0AB;font-weight:600}
+.neg{color:#F2829A;font-weight:600}
+.avatar-sm{width:30px;height:30px;border-radius:50%;background:#16323B;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#9FE9CC;vertical-align:middle;margin-left:8px}
+.avatar-sm.me{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A}
+.tag-me{font-size:10px;color:#58B9F2;border:1px solid rgba(88,185,242,.35);padding:2px 6px;border-radius:99px;margin-right:4px}
+.tag-admin{font-size:10px;color:#EF9F27;border:1px solid rgba(239,159,39,.35);padding:2px 6px;border-radius:99px;margin-right:4px}
+
+/* NOTIF */
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.notif-item:last-child{border-bottom:none}
+.notif-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.notif-dot.green{background:#4FE0AB}
+.notif-dot.blue{background:#58B9F2}
+.notif-dot.amber{background:#EF9F27}
+.notif-body{font-size:13px;line-height:1.6;color:#C3D2D7}
+.notif-time{font-size:11px;color:#6E848C;margin-top:3px}
+
+/* PERSONAL */
+.personal-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.personal-big{background:#0E1D24;border:1px solid rgba(255,255,255,.1);border-radius:17px;padding:24px;display:flex;flex-direction:column;gap:6px}
+.big-label{font-size:12px;color:#9CB1B9}
+.big-val{font-size:32px;font-weight:700;letter-spacing:-.5px}
+.big-sub{font-size:13px;color:#58B9F2;font-weight:600}
+.deposit-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.deposit-row:last-child{border-bottom:none}
+
+/* ADMIN FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-field{display:flex;flex-direction:column;gap:6px}
+.form-field label{font-size:12px;color:#8DA2AA}
+.form-field input,.form-field select{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 13px;font-family:inherit;font-size:13px;color:#EAF3F4;outline:none;transition:border-color .2s}
+.form-field input:focus,.form-field select:focus{border-color:rgba(79,224,171,.5)}
+.form-field select option{background:#0E1D24}
+.btn-action{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A;border:none;padding:11px 24px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:16px}
+.btn-action:hover{opacity:.9}
+.btn-ghost{background:transparent;color:#EAF3F4;border:1px solid rgba(255,255,255,.15);padding:11px 20px;border-radius:10px;font-family:inherit;font-size:13px;cursor:pointer}
+.btn-ghost:hover{border-color:rgba(255,255,255,.35)}
+.btn-danger{background:rgba(242,130,154,.1);color:#F2829A;border:1px solid rgba(242,130,154,.25);padding:6px 12px;border-radius:8px;font-family:inherit;font-size:12px;cursor:pointer}
+.btn-amber{background:rgba(239,159,39,.1);color:#EF9F27;border:1px solid rgba(239,159,39,.25);padding:6px 12px;border-radius:8px;font-family:inherit;font-size:12px;cursor:pointer}
+.member-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.member-row:last-child{border-bottom:none}
+.member-info{flex:1}
+.member-name{font-size:14px;font-weight:600}
+.member-email{font-size:12px;color:#8DA2AA;margin-top:2px}
+.member-share{font-size:13px;color:#4FE0AB;font-weight:600}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.status-dot.active{background:#4FE0AB}
+.status-dot.inactive{background:#F2829A}
+.profit-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:rgba(255,255,255,.02);border-radius:10px;margin-bottom:8px}
+.profit-row.highlight{background:rgba(88,185,242,.06);border:1px solid rgba(88,185,242,.15)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#0E1D24;border:1px solid rgba(79,224,171,.3);border-radius:12px;padding:12px 20px;font-size:13px;color:#EAF3F4;transition:transform .3s ease;z-index:999;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.personal-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.sidebar{width:220px}.content{padding:16px 16px 50px}.topbar{padding:16px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="page-login" class="page active">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="32" height="32" viewBox="0 0 30 30"><defs><linearGradient id="lg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4FE0AB"/><stop offset="1" stop-color="#58B9F2"/></linearGradient></defs><path d="M3 25 L11 9 L16 18 L21 6 L27 25 Z" fill="url(#lg)"/></svg>
+      <span>المحفظة المشتركة</span>
+    </div>
+    <div class="login-title">مرحباً بك</div>
+    <div class="login-sub">أدخل الرمز المكوّن من 6 أرقام</div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+      <div class="pin-dot" id="d4"></div>
+      <div class="pin-dot" id="d5"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key empty"></button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+    <div class="login-hint" id="pin-hint">أدخل رمزك للدخول</div>
+    <div class="login-demo">
+      <div>تجربة سريعة</div>
+      <div class="demo-btns">
+        <button class="demo-btn" onclick="quickLogin('member')">مشترك · 123456</button>
+        <button class="demo-btn" onclick="quickLogin('admin')">أدمن · 000000</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBER -->
+<div id="page-member" class="page">
+  <div class="sidebar">
+    <div class="sb-logo">
+      <svg width="26" height="26" viewBox="0 0 30 30"><path d="M3 25 L11 9 L16 18 L21 6 L27 25 Z" fill="#4FE0AB"/></svg>
+      <span>المحفظة المشتركة</span>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-item active" onclick="showSection('m','overview',this)"><span class="sb-dot"></span>نظرة عامة</div>
+      <div class="sb-item" onclick="showSection('m','trades',this)"><span class="sb-dot"></span>الصفقات</div>
+      <div class="sb-item" onclick="showSection('m','myportfolio',this)"><span class="sb-dot"></span>محفظتي</div>
+      <div class="sb-item" onclick="showSection('m','notif',this)"><span class="sb-dot"></span>الإشعارات <span style="background:rgba(79,224,171,.2);color:#4FE0AB;font-size:10px;padding:2px 6px;border-radius:99px;margin-right:auto">3</span></div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-back" onclick="logout()">← تسجيل الخروج</div>
+    <div class="sb-user">
+      <div class="sb-avatar">ع</div>
+      <div><div class="sb-uname">عمر</div><div class="sb-urole">مشترك نشط</div></div>
+    </div>
+  </div>
+  <div class="main">
+    <!-- overview -->
+    <div id="m-section-overview" class="section active">
+      <div class="topbar"><div><div class="topbar-title">محفظة المحفظة المشتركة</div><div class="topbar-sub">آخر تحديث: اليوم 14:32 · السوق مفتوح</div></div><div class="topbar-actions"><div class="chip">نصيبي · 8.0%</div></div></div>
+      <div class="content">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">القيمة الإجمالية</div><div class="kpi-val">4,820,000 <span class="kpi-unit">ر.س</span></div><div class="kpi-change up">▲ 12.4% منذ بداية العام</div></div>
+          <div class="kpi"><div class="kpi-label">إجمالي الأرباح 2026</div><div class="kpi-val">642,300 <span class="kpi-unit">ر.س</span></div><div class="kpi-change up">▲ 8.1% عن الربع السابق</div></div>
+          <div class="kpi"><div class="kpi-label">العائد هذا الشهر</div><div class="kpi-val" style="color:#4FE0AB">+5.6%</div><div class="kpi-change" style="color:#8DA2AA">+271,800 ر.س</div></div>
+          <div class="kpi highlight"><div class="kpi-label">نصيبك من المحفظة</div><div class="kpi-val">386,500 <span class="kpi-unit">ر.س</span></div><div class="kpi-change blue">8.0% · +62,100 ربح</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="chart-head"><div><div class="card-title">أداء المحفظة</div><div class="card-sub">القيمة بالمليون ر.س</div></div>
+            <div class="tabs"><button class="tab" onclick="setRange('شهر',this)">شهر</button><button class="tab" onclick="setRange('٣ أشهر',this)">٣ أشهر</button><button class="tab active" onclick="setRange('٦ أشهر',this)">٦ أشهر</button><button class="tab" onclick="setRange('سنة',this)">سنة</button></div></div>
+            <div class="chart-wrap"><canvas id="perf-chart"></canvas></div>
+            <div class="chart-labels" id="chart-labels"></div>
+          </div>
+          <div class="card"><div class="card-title" style="margin-bottom:18px">توزيع الأصول</div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">أسهم محلية</span><span class="alloc-pct">46%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:46%;background:#4FE0AB"></div></div></div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">صكوك وسندات</span><span class="alloc-pct">22%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:22%;background:#58B9F2"></div></div></div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">أسهم عالمية</span><span class="alloc-pct">18%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:18%;background:#6FE3D2"></div></div></div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">أوبشن</span><span class="alloc-pct">9%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:9%;background:#EF9F27"></div></div></div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">نقد</span><span class="alloc-pct">5%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:5%;background:#3E5C68"></div></div></div>
+          </div>
+        </div>
+        <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div class="card-title">المشتركون وحصصهم</div></div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><td>المساهم</td><td>المساهمة</td><td>الحصة</td><td>نصيبه من الأرباح</td></tr></thead>
+            <tbody>
+              <tr><td><span class="avatar-sm">أ</span>أحمد العتيبي</td><td>850,000 ر.س</td><td>17.6%</td><td class="pos">+136,800 ر.س</td></tr>
+              <tr><td><span class="avatar-sm">ن</span>نورة الحربي</td><td>620,000 ر.س</td><td>12.9%</td><td class="pos">+99,700 ر.س</td></tr>
+              <tr class="me"><td><span class="avatar-sm me">ع</span>عمر <span class="tag-me">أنت</span></td><td>386,500 ر.س</td><td>8.0%</td><td class="pos">+62,100 ر.س</td></tr>
+              <tr><td><span class="avatar-sm">ف</span>فهد الدوسري</td><td>350,000 ر.س</td><td>7.3%</td><td class="pos">+56,300 ر.س</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+    <!-- trades -->
+    <div id="m-section-trades" class="section">
+      <div class="topbar"><div><div class="topbar-title">الصفقات</div><div class="topbar-sub">أسهم وعقود الخيارات (Options)</div></div></div>
+      <div class="content">
+        <div class="inner-tabs">
+          <button class="inner-tab active" onclick="showInner('m-trades','stocks',this)">📈 الأسهم</button>
+          <button class="inner-tab" onclick="showInner('m-trades','options',this)">⚡ الأوبشن</button>
+        </div>
+        <!-- stocks -->
+        <div id="m-trades-stocks" class="inner-section active">
+          <div class="card" style="margin-bottom:16px"><div class="card-title" style="margin-bottom:14px">الأسهم المفتوحة</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><td>السهم</td><td>النوع</td><td>الكمية</td><td>سعر الدخول</td><td>السعر الحالي</td><td>الأثر</td></tr></thead>
+              <tbody>
+                <tr><td><div style="font-weight:600">أرامكو</div><div style="font-size:11px;color:#8DA2AA">2222</div></td><td><span class="badge buy">شراء</span></td><td>1,200</td><td>28.40</td><td style="color:#4FE0AB">30.05</td><td class="pos">+14,300 ر.س</td></tr>
+                <tr><td><div style="font-weight:600">المراعي</div><div style="font-size:11px;color:#8DA2AA">2280</div></td><td><span class="badge buy">شراء</span></td><td>1,500</td><td>52.10</td><td style="color:#4FE0AB">55.80</td><td class="pos">+5,900 ر.س</td></tr>
+                <tr><td><div style="font-weight:600">سابك</div><div style="font-size:11px;color:#8DA2AA">2010</div></td><td><span class="badge buy">شراء</span></td><td>900</td><td>71.50</td><td style="color:#F2829A">67.90</td><td class="neg">−3,200 ر.س</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="card"><div class="card-title" style="margin-bottom:14px">سجل صفقات الأسهم</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><td>السهم</td><td>النوع</td><td>الكمية</td><td>السعر</td><td>الأثر</td><td>التاريخ</td></tr></thead>
+              <tbody>
+                <tr><td><strong>أرامكو 2222</strong></td><td><span class="badge buy">شراء</span></td><td>1,200</td><td>28.40</td><td class="pos">+14,300</td><td style="color:#8DA2AA">2026-06-20</td></tr>
+                <tr><td><strong>الراجحي 1120</strong></td><td><span class="badge sell">بيع</span></td><td>600</td><td>96.20</td><td class="pos">+8,700</td><td style="color:#8DA2AA">2026-06-15</td></tr>
+                <tr><td><strong>سابك 2010</strong></td><td><span class="badge buy">شراء</span></td><td>900</td><td>71.50</td><td class="neg">−3,200</td><td style="color:#8DA2AA">2026-06-10</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+        <!-- options -->
+        <div id="m-trades-options" class="inner-section">
+          <div class="card" style="margin-bottom:16px"><div class="card-title" style="margin-bottom:14px">عقود الأوبشن المفتوحة</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><td>الأصل</td><td>النوع</td><td>Strike</td><td>الانتهاء</td><td>عدد العقود</td><td>الأثر</td></tr></thead>
+              <tbody>
+                <tr><td><div style="font-weight:600">NVDA</div></td><td><span class="badge call">CALL</span></td><td>$130</td><td>2026-07-18</td><td>5 عقود</td><td class="pos">+8,200 ر.س</td></tr>
+                <tr><td><div style="font-weight:600">AAPL</div></td><td><span class="badge put">PUT</span></td><td>$200</td><td>2026-07-25</td><td>3 عقود</td><td class="neg">−1,800 ر.س</td></tr>
+                <tr><td><div style="font-weight:600">TSLA</div></td><td><span class="badge call">CALL</span></td><td>$185</td><td>2026-08-01</td><td>4 عقود</td><td class="pos">+3,600 ر.س</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="card"><div class="card-title" style="margin-bottom:14px">سجل عقود الأوبشن</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><td>الأصل</td><td>النوع</td><td>Strike</td><td>سعر الدخول</td><td>الأثر</td><td>التاريخ</td></tr></thead>
+              <tbody>
+                <tr><td><strong>NVDA</strong></td><td><span class="badge call">CALL</span></td><td>$130</td><td>$4.20</td><td class="pos">+8,200</td><td style="color:#8DA2AA">2026-06-18</td></tr>
+                <tr><td><strong>SPY</strong></td><td><span class="badge put">PUT</span></td><td>$520</td><td>$2.80</td><td class="pos">+5,100</td><td style="color:#8DA2AA">2026-06-10</td></tr>
+                <tr><td><strong>AAPL</strong></td><td><span class="badge put">PUT</span></td><td>$200</td><td>$3.50</td><td class="neg">−1,800</td><td style="color:#8DA2AA">2026-06-05</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- my portfolio -->
+    <div id="m-section-myportfolio" class="section">
+      <div class="topbar"><div><div class="topbar-title">محفظتي الشخصية</div><div class="topbar-sub">حصتك وأرباحك التفصيلية</div></div></div>
+      <div class="content">
+        <div class="personal-grid">
+          <div class="personal-big"><div class="big-label">إجمالي استثماري</div><div class="big-val">386,500 <span style="font-size:16px;color:#9CB1B9;font-weight:400">ر.س</span></div><div class="big-sub">8.0% من رأس المال الكلي</div></div>
+          <div class="personal-big" style="border-color:rgba(79,224,171,.25)"><div class="big-label">إجمالي أرباحي</div><div class="big-val" style="color:#4FE0AB">+62,100 <span style="font-size:16px;color:#9CB1B9;font-weight:400">ر.س</span></div><div class="big-sub" style="color:#4FE0AB">عائد 16.1% على استثماري</div></div>
+        </div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi"><div class="kpi-label">العائد هذا الشهر</div><div class="kpi-val" style="color:#4FE0AB;font-size:20px">+5.6%</div><div class="kpi-change up">+4,968 ر.س</div></div>
+          <div class="kpi"><div class="kpi-label">تاريخ الانضمام</div><div class="kpi-val" style="font-size:18px">يناير 2026</div><div class="kpi-change" style="color:#8DA2AA">منذ 6 أشهر</div></div>
+          <div class="kpi"><div class="kpi-label">ترتيبي بين الأعضاء</div><div class="kpi-val" style="font-size:20px">#4</div><div class="kpi-change" style="color:#8DA2AA">من 6 أعضاء</div></div>
+        </div>
+        <div class="card"><div class="card-title" style="margin-bottom:16px">سجل إيداعاتي</div>
+          <div class="deposit-row"><span>الإيداع الأول</span><div><span style="font-size:12px;color:#8DA2AA;margin-left:12px">يناير 2026</span><span style="font-weight:600">300,000 ر.س</span></div></div>
+          <div class="deposit-row"><span>إيداع إضافي</span><div><span style="font-size:12px;color:#8DA2AA;margin-left:12px">مارس 2026</span><span style="font-weight:600">86,500 ر.س</span></div></div>
+          <div class="deposit-row" style="border-bottom:none"><span style="font-weight:600">الإجمالي</span><span style="color:#4FE0AB;font-weight:700">386,500 ر.س</span></div>
+        </div>
+      </div>
+    </div>
+    <!-- notif -->
+    <div id="m-section-notif" class="section">
+      <div class="topbar"><div><div class="topbar-title">الإشعارات</div><div class="topbar-sub">3 إشعارات غير مقروءة</div></div></div>
+      <div class="content"><div class="card">
+        <div class="notif-item"><span class="notif-dot green"></span><div><div class="notif-body">صفقة شراء جديدة — <strong>أرامكو 2222</strong> · 1,200 سهم بـ 28.40 ر.س · أثرك <span class="pos">+1,144 ر.س</span></div><div class="notif-time">اليوم · 14:32</div></div></div>
+        <div class="notif-item"><span class="notif-dot amber"></span><div><div class="notif-body">عقد أوبشن جديد — <strong>NVDA CALL $130</strong> · 5 عقود · أثرك <span class="pos">+656 ر.س</span></div><div class="notif-time">أمس · 10:50</div></div></div>
+        <div class="notif-item"><span class="notif-dot blue"></span><div><div class="notif-body">توزيع أرباح الربع الأول 2026 · نصيبك <span class="pos">+18,400 ر.س</span></div><div class="notif-time">2026-04-01</div></div></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="page-admin" class="page">
+  <div class="sidebar">
+    <div class="sb-logo">
+      <svg width="26" height="26" viewBox="0 0 30 30"><path d="M3 25 L11 9 L16 18 L21 6 L27 25 Z" fill="#4FE0AB"/></svg>
+      <span>المحفظة المشتركة</span>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-item active" onclick="showSection('a','overview',this)"><span class="sb-dot"></span>نظرة عامة</div>
+      <div class="sb-item" onclick="showSection('a','members',this)"><span class="sb-dot"></span>إدارة الأعضاء</div>
+      <div class="sb-item" onclick="showSection('a','trades',this)"><span class="sb-dot"></span>إدخال الصفقات</div>
+      <div class="sb-item" onclick="showSection('a','profits',this)"><span class="sb-dot"></span>توزيع الأرباح</div>
+      <div class="sb-item" onclick="showSection('a','reports',this)"><span class="sb-dot"></span>تقارير الأداء</div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-back" onclick="logout()">← تسجيل الخروج</div>
+    <div class="sb-user">
+      <div class="sb-avatar" style="font-size:11px">ADM</div>
+      <div><div class="sb-uname">عمر (أدمن)</div><div class="sb-urole" style="color:#EF9F27">صلاحيات كاملة</div></div>
+    </div>
+  </div>
+  <div class="main">
+    <!-- admin overview -->
+    <div id="a-section-overview" class="section active">
+      <div class="topbar">
+        <div><div class="topbar-title">محفظة المحفظة المشتركة — لوحة الأدمن</div><div class="topbar-sub">آخر تحديث: اليوم 14:32 · السوق مفتوح</div></div>
+        <div class="topbar-actions"><div class="chip"><span style="width:7px;height:7px;border-radius:50%;background:#4FE0AB;display:inline-block;margin-left:6px"></span>السوق مفتوح</div><button class="btn-grad" onclick="showSection('a','trades',document.querySelectorAll('#page-admin .sb-item')[2])">+ صفقة جديدة</button></div>
+      </div>
+      <div class="content">
+        <div style="background:#0E1D24;border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:32px 28px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center">
+          <div>
+            <div style="font-size:13px;color:#8DA2AA;margin-bottom:10px">القيمة الإجمالية للمحفظة</div>
+            <div style="font-family:'El Messiri',serif;font-size:52px;font-weight:700;letter-spacing:-1px;line-height:1">4,820,000</div>
+            <div style="font-size:18px;color:#8DA2AA;margin-top:4px;margin-bottom:16px">ريال سعودي</div>
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(79,224,171,.12);color:#4FE0AB;padding:8px 16px;border-radius:99px;font-size:14px;font-weight:600">▲ 12.4% منذ بداية العام</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px"><div style="font-size:11px;color:#8DA2AA;margin-bottom:6px">إجمالي الأرباح</div><div style="font-size:22px;font-weight:700;color:#4FE0AB">+642,300</div><div style="font-size:11px;color:#8DA2AA;margin-top:3px">ر.س · 2026</div></div>
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px"><div style="font-size:11px;color:#8DA2AA;margin-bottom:6px">العائد هذا الشهر</div><div style="font-size:22px;font-weight:700;color:#4FE0AB">+5.6%</div><div style="font-size:11px;color:#8DA2AA;margin-top:3px">+271,800 ر.س</div></div>
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px"><div style="font-size:11px;color:#8DA2AA;margin-bottom:6px">عدد الأعضاء</div><div style="font-size:22px;font-weight:700">6</div><div style="font-size:11px;color:#4FE0AB;margin-top:3px">5 نشطين</div></div>
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px"><div style="font-size:11px;color:#8DA2AA;margin-bottom:6px">الصفقات المفتوحة</div><div style="font-size:22px;font-weight:700">6</div><div style="font-size:11px;color:#8DA2AA;margin-top:3px">أسهم + أوبشن</div></div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="chart-head"><div><div class="card-title">أداء المحفظة</div><div class="card-sub">القيمة بالمليون ر.س</div></div>
+            <div class="tabs"><button class="tab" onclick="setRange('شهر',this)">شهر</button><button class="tab" onclick="setRange('٣ أشهر',this)">٣ أشهر</button><button class="tab active" onclick="setRange('٦ أشهر',this)">٦ أشهر</button><button class="tab" onclick="setRange('سنة',this)">سنة</button></div></div>
+            <div class="chart-wrap"><canvas id="admin-overview-chart"></canvas></div>
+            <div class="chart-labels" id="admin-overview-labels"></div>
+          </div>
+          <div class="card"><div class="card-title" style="margin-bottom:18px">توزيع الأصول</div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">أسهم محلية</span><span class="alloc-pct">46%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:46%;background:#4FE0AB"></div></div></div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">صكوك وسندات</span><span class="alloc-pct">22%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:22%;background:#58B9F2"></div></div></div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">أسهم عالمية</span><span class="alloc-pct">18%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:18%;background:#6FE3D2"></div></div></div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">أوبشن</span><span class="alloc-pct">9%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:9%;background:#EF9F27"></div></div></div>
+            <div class="alloc-row"><div class="alloc-head"><span class="alloc-name">نقد</span><span class="alloc-pct">5%</span></div><div class="alloc-bar"><div class="alloc-fill" style="width:5%;background:#3E5C68"></div></div></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div class="card-title">المشتركون وحصصهم</div><span style="font-size:12px;color:#58B9F2;cursor:pointer" onclick="showSection('a','members',document.querySelectorAll('#page-admin .sb-item')[1])">إدارة الأعضاء ←</span></div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><td>المساهم</td><td>المساهمة</td><td>الحصة</td><td>الأرباح</td><td>الصلاحية</td><td>الحالة</td></tr></thead>
+            <tbody>
+              <tr><td><span class="avatar-sm" style="display:inline-flex">أ</span>أحمد العتيبي</td><td>850,000</td><td>17.6%</td><td class="pos">+136,800</td><td><span class="tag-admin">أدمن</span></td><td><span style="color:#4FE0AB;font-size:12px">● نشط</span></td></tr>
+              <tr><td><span class="avatar-sm" style="display:inline-flex">ن</span>نورة الحربي</td><td>620,000</td><td>12.9%</td><td class="pos">+99,700</td><td>—</td><td><span style="color:#4FE0AB;font-size:12px">● نشط</span></td></tr>
+              <tr class="me"><td><span class="avatar-sm me" style="display:inline-flex">ع</span>عمر <span class="tag-me">أنت</span><span class="tag-admin">أدمن</span></td><td>386,500</td><td>8.0%</td><td class="pos">+62,100</td><td><span class="tag-admin">أدمن</span></td><td><span style="color:#4FE0AB;font-size:12px">● نشط</span></td></tr>
+              <tr><td><span class="avatar-sm" style="display:inline-flex">ف</span>فهد الدوسري</td><td>350,000</td><td>7.3%</td><td class="pos">+56,300</td><td>—</td><td><span style="color:#4FE0AB;font-size:12px">● نشط</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- members management -->
+    <div id="a-section-members" class="section">
+      <div class="topbar"><div><div class="topbar-title">إدارة الأعضاء</div><div class="topbar-sub">6 أعضاء · 2 أدمن</div></div><button class="btn-grad" onclick="showAddMember()">+ إضافة عضو</button></div>
+      <div class="content">
+        <div class="card" style="margin-bottom:20px;display:none" id="add-member-card">
+          <div class="card-title" style="margin-bottom:16px">إضافة عضو جديد</div>
+          <div class="form-grid">
+            <div class="form-field"><label>الاسم الكامل</label><input type="text" id="new-name" placeholder="مثال: أحمد محمد"></div>
+            <div class="form-field"><label>البريد الإلكتروني (للدعوة فقط)</label><input type="email" id="new-email" placeholder="ahmed@email.com"></div>
+            <div class="form-field"><label>الرمز السري 6 أرقام</label><input type="text" id="new-pin" placeholder="مثال: 247813" maxlength="6"></div>
+            <div class="form-field"><label>مبلغ المساهمة (ر.س)</label><input type="number" id="new-amount" placeholder="100000"></div>
+            <div class="form-field"><label>تاريخ الانضمام</label><input type="date" id="new-date"></div>
+            <div class="form-field"><label>الصلاحية</label><select id="new-role"><option value="member">مشترك عادي</option><option value="admin">أدمن</option></select></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:16px"><button class="btn-action" onclick="addMember()">إضافة وإرسال دعوة</button><button class="btn-ghost" onclick="hideAddMember()">إلغاء</button></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">قائمة الأعضاء</div>
+          <div id="members-list">
+            <div class="member-row"><span class="status-dot active"></span><div class="avatar-sm me" style="display:inline-flex">ع</div><div class="member-info" style="margin-right:8px"><div class="member-name">عمر <span class="tag-me">أنت</span><span class="tag-admin">أدمن</span></div><div class="member-email">رمز: 000000 · انضم يناير 2026</div></div><span class="member-share">8.0%</span><span style="font-size:12px;color:#6E848C;margin-right:8px">لا يمكن تعديل حسابك</span></div>
+            <div class="member-row"><span class="status-dot active"></span><div class="avatar-sm" style="display:inline-flex;background:#2a2a0a;color:#EF9F27">أ</div><div class="member-info" style="margin-right:8px"><div class="member-name">أحمد العتيبي <span class="tag-admin">أدمن</span></div><div class="member-email">ahmed@email.com · رمز: 112233</div></div><span class="member-share">17.6%</span><button class="btn-danger" onclick="toggleAdmin(this,'أحمد')">شيل الأدمن</button></div>
+            <div class="member-row"><span class="status-dot active"></span><div class="avatar-sm" style="display:inline-flex">ن</div><div class="member-info" style="margin-right:8px"><div class="member-name">نورة الحربي</div><div class="member-email">noura@email.com · رمز: 445566</div></div><span class="member-share">12.9%</span><button class="btn-amber" onclick="toggleAdmin(this,'نورة')">أعطِ أدمن</button></div>
+            <div class="member-row"><span class="status-dot active"></span><div class="avatar-sm" style="display:inline-flex">خ</div><div class="member-info" style="margin-right:8px"><div class="member-name">خالد السبيعي</div><div class="member-email">khalid@email.com · رمز: 778899</div></div><span class="member-share">10.0%</span><button class="btn-amber" onclick="toggleAdmin(this,'خالد')">أعطِ أدمن</button></div>
+            <div class="member-row"><span class="status-dot active"></span><div class="avatar-sm" style="display:inline-flex">ف</div><div class="member-info" style="margin-right:8px"><div class="member-name">فهد الدوسري</div><div class="member-email">fahad@email.com · رمز: 321654</div></div><span class="member-share">7.3%</span><button class="btn-amber" onclick="toggleAdmin(this,'فهد')">أعطِ أدمن</button></div>
+            <div class="member-row"><span class="status-dot inactive"></span><div class="avatar-sm" style="display:inline-flex;background:#2a1a1a;color:#F2829A">ل</div><div class="member-info" style="margin-right:8px"><div class="member-name" style="color:#8DA2AA">لمى الزهراني</div><div class="member-email">lama@email.com · معطّل</div></div><span class="member-share" style="color:#F2829A">6.0%</span><button class="btn-ghost" style="padding:6px 12px;font-size:12px">تفعيل</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- trades input -->
+    <div id="a-section-trades" class="section">
+      <div class="topbar"><div><div class="topbar-title">إدخال الصفقات</div><div class="topbar-sub">أسهم وعقود الأوبشن</div></div></div>
+      <div class="content">
+        <div class="inner-tabs">
+          <button class="inner-tab active" onclick="showInner('a-trades','stocks',this)">📈 صفقة أسهم</button>
+          <button class="inner-tab" onclick="showInner('a-trades','options',this)">⚡ عقد أوبشن</button>
+        </div>
+        <!-- stocks input -->
+        <div id="a-trades-stocks" class="inner-section active">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:16px">تسجيل صفقة أسهم جديدة</div>
+            <div class="form-grid">
+              <div class="form-field"><label>رمز السهم</label><input type="text" id="ts-ticker" placeholder="2222 أو AAPL"></div>
+              <div class="form-field"><label>اسم الشركة</label><input type="text" id="ts-name" placeholder="أرامكو السعودية"></div>
+              <div class="form-field"><label>نوع الصفقة</label><select id="ts-type"><option value="buy">شراء</option><option value="sell">بيع</option></select></div>
+              <div class="form-field"><label>الكمية</label><input type="number" id="ts-qty" placeholder="1000"></div>
+              <div class="form-field"><label>سعر السهم (ر.س)</label><input type="number" id="ts-price" placeholder="28.50" step="0.01"></div>
+              <div class="form-field"><label>التاريخ</label><input type="date" id="ts-date"></div>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;font-size:13px;color:#8DA2AA" id="stock-preview">أدخل بيانات الصفقة لرؤية الملخص</div>
+            <button class="btn-action" onclick="saveStockTrade()">تسجيل وإشعار الأعضاء</button>
+          </div>
+        </div>
+        <!-- options input -->
+        <div id="a-trades-options" class="inner-section">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:16px">تسجيل عقد أوبشن جديد</div>
+            <div class="form-grid">
+              <div class="form-field"><label>الأصل (Ticker)</label><input type="text" id="to-ticker" placeholder="NVDA أو SPY"></div>
+              <div class="form-field"><label>نوع العقد</label><select id="to-type"><option value="call">CALL (توقع صعود)</option><option value="put">PUT (توقع هبوط)</option></select></div>
+              <div class="form-field"><label>سعر التنفيذ (Strike)</label><input type="number" id="to-strike" placeholder="130" step="0.5"></div>
+              <div class="form-field"><label>تاريخ الانتهاء</label><input type="date" id="to-expiry"></div>
+              <div class="form-field"><label>عدد العقود</label><input type="number" id="to-qty" placeholder="5" min="1"></div>
+              <div class="form-field"><label>سعر العقد ($)</label><input type="number" id="to-premium" placeholder="4.20" step="0.01"></div>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;font-size:13px;color:#8DA2AA" id="option-preview">أدخل بيانات العقد لرؤية الملخص</div>
+            <button class="btn-action" onclick="saveOptionTrade()">تسجيل وإشعار الأعضاء</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">آخر الصفقات المسجّلة</div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><td>الأصل</td><td>النوع</td><td>التفاصيل</td><td>التاريخ</td></tr></thead>
+            <tbody>
+              <tr><td><strong>أرامكو 2222</strong></td><td><span class="badge buy">شراء سهم</span></td><td>1,200 × 28.40 = 34,080 ر.س</td><td style="color:#8DA2AA">2026-06-20</td></tr>
+              <tr><td><strong>NVDA</strong></td><td><span class="badge call">CALL أوبشن</span></td><td>5 عقود · Strike $130 · يونيو 18</td><td style="color:#8DA2AA">2026-06-18</td></tr>
+              <tr><td><strong>الراجحي 1120</strong></td><td><span class="badge sell">بيع سهم</span></td><td>600 × 96.20 = 57,720 ر.س</td><td style="color:#8DA2AA">2026-06-15</td></tr>
+              <tr><td><strong>AAPL</strong></td><td><span class="badge put">PUT أوبشن</span></td><td>3 عقود · Strike $200 · يوليو 25</td><td style="color:#8DA2AA">2026-06-05</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- profits -->
+    <div id="a-section-profits" class="section">
+      <div class="topbar"><div><div class="topbar-title">توزيع الأرباح</div><div class="topbar-sub">حساب تلقائي بحسب حصة كل عضو</div></div><button class="btn-grad" onclick="showToast('تم توزيع الأرباح وإرسال إشعارات لجميع الأعضاء ✓')">توزيع وإشعار الكل</button></div>
+      <div class="content">
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+          <div class="kpi"><div class="kpi-label">إجمالي الأرباح للتوزيع</div><div class="kpi-val">642,300 <span class="kpi-unit">ر.س</span></div></div>
+          <div class="kpi"><div class="kpi-label">عدد الأعضاء النشطين</div><div class="kpi-val">5</div></div>
+          <div class="kpi"><div class="kpi-label">فترة التوزيع</div><div class="kpi-val" style="font-size:18px">يناير — يونيو 2026</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">نصيب كل عضو</div>
+          <div class="profit-row"><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm" style="display:inline-flex;background:#2a2a0a;color:#EF9F27">أ</div><div><div style="font-size:13px;font-weight:600">أحمد العتيبي</div><div style="font-size:11px;color:#8DA2AA">حصة 17.6%</div></div></div><span class="pos" style="font-size:15px;font-weight:700">+136,800 ر.س</span></div>
+          <div class="profit-row"><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm" style="display:inline-flex">ن</div><div><div style="font-size:13px;font-weight:600">نورة الحربي</div><div style="font-size:11px;color:#8DA2AA">حصة 12.9%</div></div></div><span class="pos" style="font-size:15px;font-weight:700">+99,700 ر.س</span></div>
+          <div class="profit-row highlight"><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm me" style="display:inline-flex">ع</div><div><div style="font-size:13px;font-weight:600">عمر <span class="tag-me">أنت</span></div><div style="font-size:11px;color:#8DA2AA">حصة 8.0%</div></div></div><span class="pos" style="font-size:15px;font-weight:700">+62,100 ر.س</span></div>
+          <div class="profit-row"><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm" style="display:inline-flex">ف</div><div><div style="font-size:13px;font-weight:600">فهد الدوسري</div><div style="font-size:11px;color:#8DA2AA">حصة 7.3%</div></div></div><span class="pos" style="font-size:15px;font-weight:700">+56,300 ر.س</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- reports -->
+    <div id="a-section-reports" class="section">
+      <div class="topbar"><div><div class="topbar-title">تقارير الأداء</div><div class="topbar-sub">نظرة شاملة</div></div></div>
+      <div class="content">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">رأس المال</div><div class="kpi-val">4,820,000 <span class="kpi-unit">ر.س</span></div><div class="kpi-change up">▲ 12.4% YTD</div></div>
+          <div class="kpi"><div class="kpi-label">إجمالي الأرباح</div><div class="kpi-val">642,300 <span class="kpi-unit">ر.س</span></div><div class="kpi-change up">▲ 8.1% عن الربع السابق</div></div>
+          <div class="kpi"><div class="kpi-label">عدد الصفقات</div><div class="kpi-val">47</div><div class="kpi-change" style="color:#8DA2AA">هذا العام</div></div>
+          <div class="kpi"><div class="kpi-label">متوسط العائد الشهري</div><div class="kpi-val" style="color:#4FE0AB">+2.1%</div><div class="kpi-change up">+5.6% هذا الشهر</div></div>
+        </div>
+        <div class="card">
+          <div class="chart-head"><div><div class="card-title">أداء المحفظة — تقرير إداري</div><div class="card-sub">القيمة بالمليون ر.س</div></div></div>
+          <div class="chart-wrap"><canvas id="admin-report-chart"></canvas></div>
+          <div class="chart-labels" id="admin-report-labels"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  المحفظة المشتركة — الاتصال بـ Google Sheets
+//  ضع رابط Apps Script هنا بعد النشر
+// ══════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXQJkJ0DZaZks_nryuZpS_t2HULZ3QzblvZGfOpj91aFiPj0Hbjfg4CWhemduznQtOpw/exec';
+
+// helper: اتصال بالـ script
+async function api(action, params={}) {
+  const url = SCRIPT_URL + '?action=' + action + '&' + new URLSearchParams(params);
+  try {
+    const res = await fetch(url);
+    return await res.json();
+  } catch(e) {
+    console.error('API error:', e);
+    return { error: 'فشل الاتصال بالشيت' };
+  }
+}
+async function apiPost(body) {
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+    return await res.json();
+  } catch(e) {
+    console.error('API POST error:', e);
+    return { error: 'فشل الاتصال بالشيت' };
+  }
+}
+
+// ── الحالة العامة ──
+let currentUser = null;
+let pin = '';
+let perfChart=null, adminOverviewChart=null, adminReportChart=null;
+let currentRange='٦ أشهر';
+
+// ══════════════════════════════
+//  PIN
+// ══════════════════════════════
+function pinPress(d){
+  if(pin.length>=6) return;
+  pin += d;
+  updateDots();
+  if(pin.length===6) setTimeout(doLogin,200);
+}
+function pinDel(){
+  pin = pin.slice(0,-1);
+  updateDots();
+  resetDotError();
+}
+function updateDots(){
+  for(let i=0;i<6;i++){
+    const dot=document.getElementById('d'+i);
+    dot.classList.toggle('filled', i<pin.length);
+    dot.classList.remove('error');
+  }
+}
+function resetDotError(){
+  for(let i=0;i<6;i++) document.getElementById('d'+i).classList.remove('error');
+}
+
+// ══════════════════════════════
+//  تسجيل الدخول
+// ══════════════════════════════
+async function doLogin(){
+  const hint = document.getElementById('pin-hint');
+  hint.textContent = 'جاري التحقق...';
+  hint.style.color = '#8DA2AA';
+
+  let user = null;
+
+  // إذا ما في رابط شيت → وضع تجريبي
+  if(SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwXQJkJ0DZaZks_nryuZpS_t2HULZ3QzblvZGfOpj91aFiPj0Hbjfg4CWhemduznQtOpw/exec'){
+    const DEMO = {
+      '000000':{ name:'عمر', role:'admin', amount:386500, id:'M001' },
+      '112233':{ name:'أحمد العتيبي', role:'admin', amount:850000, id:'M002' },
+      '445566':{ name:'نورة الحربي', role:'member', amount:620000, id:'M003' },
+      '778899':{ name:'خالد السبيعي', role:'member', amount:480000, id:'M004' },
+      '321654':{ name:'فهد الدوسري', role:'member', amount:350000, id:'M005' },
+    };
+    user = DEMO[pin] ? {...DEMO[pin], pin} : null;
+  } else {
+    const result = await api('login', { pin });
+    if(result.success) user = result.user;
+  }
+
+  if(!user){
+    for(let i=0;i<6;i++) document.getElementById('d'+i).classList.add('error');
+    hint.textContent = 'رمز خاطئ، حاول مجدداً';
+    hint.style.color = '#F2829A';
+    setTimeout(()=>{ pin=''; updateDots(); hint.textContent='أدخل رمزك للدخول'; hint.style.color=''; },800);
+    return;
+  }
+
+  currentUser = user;
+  hint.textContent = `مرحباً ${user.name}!`;
+  hint.style.color = '#4FE0AB';
+
+  setTimeout(()=>{
+    loginAs(user.role);
+    if(SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwXQJkJ0DZaZks_nryuZpS_t2HULZ3QzblvZGfOpj91aFiPj0Hbjfg4CWhemduznQtOpw/exec') loadDashboardData(user.role);
+  }, 400);
+}
+
+function quickLogin(role){
+  pin = role==='admin' ? '000000' : '445566';
+  updateDots();
+  setTimeout(doLogin,200);
+}
+
+function loginAs(role){
+  document.getElementById('page-login').classList.remove('active');
+  pin=''; updateDots();
+  if(role==='admin'){
+    document.getElementById('page-admin').classList.add('active');
+    updateAdminUserBar();
+    setTimeout(initAdminOverviewChart,100);
+  } else {
+    document.getElementById('page-member').classList.add('active');
+    updateMemberUserBar();
+    setTimeout(()=>initChart(currentRange),100);
+  }
+}
+
+function updateMemberUserBar(){
+  if(!currentUser) return;
+  const init = currentUser.name?.slice(0,1) || 'م';
+  document.querySelector('#page-member .sb-avatar').textContent = init;
+  document.querySelector('#page-member .sb-uname').textContent = currentUser.name || '';
+}
+function updateAdminUserBar(){
+  if(!currentUser) return;
+  document.querySelector('#page-admin .sb-uname').textContent = (currentUser.name||'') + ' (أدمن)';
+}
+
+function logout(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-login').classList.add('active');
+  currentUser = null; pin=''; updateDots();
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('page-login').classList.contains('active')){
+    if(e.key>='0'&&e.key<='9') pinPress(e.key);
+    if(e.key==='Backspace') pinDel();
+  }
+});
+
+// ══════════════════════════════
+//  تحميل البيانات من الشيت
+// ══════════════════════════════
+async function loadDashboardData(role){
+  showToast('جاري تحميل البيانات من الشيت...');
+  try {
+    const [summary, stocks, options, members] = await Promise.all([
+      api('getSummary'),
+      api('getStocks'),
+      api('getOptions'),
+      api('getMembers')
+    ]);
+    updateKPIs(summary);
+    renderStocksTable(stocks.rows || []);
+    renderOptionsTable(options.rows || []);
+    if(role==='admin') renderMembersTable(members.rows || []);
+    showToast('✓ تم تحميل البيانات');
+  } catch(e) {
+    showToast('تعذّر تحميل البيانات');
+  }
+}
+
+function updateKPIs(s){
+  if(!s || s.error) return;
+  const fmt = n => Number(n).toLocaleString('ar-SA');
+  // member KPIs
+  safeSet('kpi-total-capital', fmt(s.totalCapital) + ' ر.س');
+  safeSet('kpi-total-pnl', (s.totalPnl>=0?'+':'')+fmt(s.totalPnl) + ' ر.س');
+  // admin KPIs
+  safeSet('kpi-a-capital', fmt(s.totalCapital) + ' ر.س');
+  safeSet('kpi-a-members', s.activeMembers);
+  safeSet('kpi-a-trades', (s.stockTrades||0)+(s.optionTrades||0));
+}
+function safeSet(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+
+function renderStocksTable(rows){
+  const tbody = document.getElementById('stocks-tbody');
+  if(!tbody || !rows.length) return;
+  tbody.innerHTML = rows.map(r=>`
+    <tr>
+      <td><div style="font-weight:600">${r.ticker}</div><div style="font-size:11px;color:#8DA2AA">${r.companyName||''}</div></td>
+      <td><span class="badge ${r.type}">${r.type==='buy'?'شراء':'بيع'}</span></td>
+      <td>${Number(r.qty).toLocaleString()}</td>
+      <td>${Number(r.price).toLocaleString()}</td>
+      <td class="${Number(r.pnl)>=0?'pos':'neg'}">${Number(r.pnl)>=0?'+':''}${Number(r.pnl).toLocaleString()} ر.س</td>
+      <td style="color:#8DA2AA">${r.date}</td>
+    </tr>`).join('');
+}
+function renderOptionsTable(rows){
+  const tbody = document.getElementById('options-tbody');
+  if(!tbody || !rows.length) return;
+  tbody.innerHTML = rows.map(r=>`
+    <tr>
+      <td><div style="font-weight:600">${r.ticker}</div></td>
+      <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
+      <td>$${r.strike}</td>
+      <td>${r.expiry}</td>
+      <td>${r.contracts} عقود</td>
+      <td class="${Number(r.pnl)>=0?'pos':'neg'}">${Number(r.pnl)>=0?'+':''}${Number(r.pnl).toLocaleString()} ر.س</td>
+    </tr>`).join('');
+}
+function renderMembersTable(rows){
+  const list = document.getElementById('members-list');
+  if(!list || !rows.length) return;
+  const totalCap = rows.filter(r=>r.status==='active').reduce((s,r)=>s+Number(r.amount),0);
+  list.innerHTML = rows.map(r=>{
+    const pct = totalCap>0?((Number(r.amount)/totalCap)*100).toFixed(1):0;
+    const isMe = currentUser && r.id===currentUser.id;
+    const isAdmin = r.role==='admin';
+    return `<div class="member-row">
+      <span class="status-dot ${r.status==='active'?'active':'inactive'}"></span>
+      <div class="avatar-sm ${isMe?'me':''}" style="display:inline-flex">${r.name?.slice(0,1)||'؟'}</div>
+      <div class="member-info" style="margin-right:8px">
+        <div class="member-name">${r.name} ${isMe?'<span class="tag-me">أنت</span>':''} ${isAdmin?'<span class="tag-admin">أدمن</span>':''}</div>
+        <div class="member-email">${r.email||''} · رمز: ${r.pin}</div>
+      </div>
+      <span class="member-share">${pct}%</span>
+      ${!isMe ? `<button class="${isAdmin?'btn-danger':'btn-amber'}" onclick="toggleAdminRole('${r.id}','${isAdmin?'member':'admin'}',this)">${isAdmin?'شيل الأدمن':'أعطِ أدمن'}</button>` : '<span style="font-size:11px;color:#6E848C">حسابك</span>'}
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════
+//  أقسام
+// ══════════════════════════════
+function showSection(prefix,name,el){
+  const page = prefix==='m'?'member':'admin';
+  document.querySelectorAll(`#page-${page} .section`).forEach(s=>s.classList.remove('active'));
+  document.getElementById(`${prefix}-section-${name}`).classList.add('active');
+  document.querySelectorAll(`#page-${page} .sb-item`).forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(name==='overview'&&prefix==='m') setTimeout(()=>initChart(currentRange),50);
+  if(name==='overview'&&prefix==='a') setTimeout(initAdminOverviewChart,50);
+  if(name==='reports') setTimeout(initReportChart,50);
+}
+function showInner(prefix,name,el){
+  const parent=document.getElementById(`${prefix}-${name}`).parentElement;
+  parent.querySelectorAll('.inner-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`${prefix}-${name}`).classList.add('active');
+  el.closest('.inner-tabs').querySelectorAll('.inner-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ══════════════════════════════
+//  مخططات
+// ══════════════════════════════
+const chartData={
+  'شهر':   {vals:[4.62,4.71,4.66,4.82],labels:['الأسبوع ١','الأسبوع ٢','الأسبوع ٣','الأسبوع ٤']},
+  '٣ أشهر':{vals:[4.22,4.36,4.51,4.58,4.72,4.82],labels:['أبريل','','مايو','','يونيو','']},
+  '٦ أشهر':{vals:[3.90,4.05,3.98,4.22,4.51,4.82],labels:['يناير','فبراير','مارس','أبريل','مايو','يونيو']},
+  'سنة':   {vals:[3.10,3.35,3.28,3.55,3.72,3.90,3.98,4.05,4.22,4.40,4.62,4.82],labels:['يول','أغس','سبت','أكت','نوف','ديس','ينا','فبر','مار','أبر','ماي','يون']}
+};
+function makeChart(id,labelsId,range,color){
+  const d=chartData[range];
+  const lEl=document.getElementById(labelsId);
+  if(lEl)lEl.innerHTML=d.labels.map(l=>`<span>${l}</span>`).join('');
+  const ctx=document.getElementById(id);
+  if(!ctx)return null;
+  return new Chart(ctx,{type:'line',data:{labels:d.labels,datasets:[{data:d.vals,borderColor:color,backgroundColor:color+'22',borderWidth:2.5,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:color,pointBorderColor:'#091317',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8DA2AA',font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#8DA2AA',font:{size:11},callback:v=>v.toFixed(2)+'M'},grid:{color:'rgba(255,255,255,0.04)'}}}}});
+}
+function initChart(range){ if(perfChart){perfChart.destroy();perfChart=null;} perfChart=makeChart('perf-chart','chart-labels',range,'#4FE0AB'); }
+function initAdminOverviewChart(){ if(adminOverviewChart){adminOverviewChart.destroy();adminOverviewChart=null;} adminOverviewChart=makeChart('admin-overview-chart','admin-overview-labels',currentRange,'#4FE0AB'); }
+function initReportChart(){ if(adminReportChart){adminReportChart.destroy();adminReportChart=null;} adminReportChart=makeChart('admin-report-chart','admin-report-labels','٦ أشهر','#58B9F2'); }
+function setRange(range,el){ currentRange=range; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); initChart(range); initAdminOverviewChart(); }
+
+// ══════════════════════════════
+//  إجراءات الأدمن
+// ══════════════════════════════
+function showAddMember(){
+  const c=document.getElementById('add-member-card');
+  c.style.display=c.style.display==='none'||!c.style.display?'block':'none';
+  document.getElementById('new-date').value=new Date().toISOString().split('T')[0];
+}
+function hideAddMember(){document.getElementById('add-member-card').style.display='none';}
+
+async function addMember(){
+  const name=document.getElementById('new-name').value.trim();
+  const email=document.getElementById('new-email').value.trim();
+  const pinVal=document.getElementById('new-pin').value.trim();
+  const amount=document.getElementById('new-amount').value.trim();
+  const role=document.getElementById('new-role').value;
+  const date=document.getElementById('new-date').value;
+  if(!name||!pinVal||pinVal.length!==6){showToast('أدخل الاسم والرمز السري (6 أرقام)');return;}
+
+  if(SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwXQJkJ0DZaZks_nryuZpS_t2HULZ3QzblvZGfOpj91aFiPj0Hbjfg4CWhemduznQtOpw/exec'){
+    showToast('جاري الإضافة...');
+    const r = await apiPost({action:'addMember', data:{name,email,pin:pinVal,amount:Number(amount),role,joinDate:date}});
+    if(r.error){showToast('خطأ: '+r.error);return;}
+    showToast(`✓ تم إضافة ${name} · رمزه: ${pinVal}`);
+    await loadDashboardData('admin');
+  } else {
+    showToast(`✓ تم إضافة ${name} (وضع تجريبي)`);
+  }
+  hideAddMember();
+  ['new-name','new-email','new-pin','new-amount'].forEach(id=>document.getElementById(id).value='');
+}
+
+async function toggleAdminRole(memberId, newRole, btn){
+  if(SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwXQJkJ0DZaZks_nryuZpS_t2HULZ3QzblvZGfOpj91aFiPj0Hbjfg4CWhemduznQtOpw/exec'){
+    const r = await apiPost({action:'toggleAdmin', memberId, role:newRole});
+    if(r.error){showToast('خطأ: '+r.error);return;}
+  }
+  const name = btn.closest('.member-row').querySelector('.member-name').textContent.trim().split(' ')[0];
+  if(newRole==='admin'){
+    btn.textContent='شيل الأدمن'; btn.className='btn-danger';
+    btn.setAttribute('onclick',`toggleAdminRole('${memberId}','member',this)`);
+    showToast(`✓ تم إعطاء ${name} صلاحية الأدمن`);
+  } else {
+    btn.textContent='أعطِ أدمن'; btn.className='btn-amber';
+    btn.setAttribute('onclick',`toggleAdminRole('${memberId}','admin',this)`);
+    showToast(`✓ تم سحب صلاحية الأدمن من ${name}`);
+  }
+}
+
+async function saveStockTrade(){
+  const ticker=document.getElementById('ts-ticker').value.trim();
+  const name=document.getElementById('ts-name').value.trim();
+  const type=document.getElementById('ts-type').value;
+  const qty=document.getElementById('ts-qty').value.trim();
+  const price=document.getElementById('ts-price').value.trim();
+  const date=document.getElementById('ts-date').value;
+  if(!ticker||!qty||!price){showToast('أكمل بيانات الصفقة');return;}
+
+  if(SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwXQJkJ0DZaZks_nryuZpS_t2HULZ3QzblvZGfOpj91aFiPj0Hbjfg4CWhemduznQtOpw/exec'){
+    showToast('جاري التسجيل...');
+    const r = await apiPost({action:'addStock', data:{ticker,name,type,qty:Number(qty),price:Number(price),date}});
+    if(r.error){showToast('خطأ: '+r.error);return;}
+  }
+  showToast(`✓ تم تسجيل صفقة ${type==='buy'?'شراء':'بيع'} ${ticker} وإشعار الأعضاء`);
+  ['ts-ticker','ts-name','ts-qty','ts-price'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('stock-preview').textContent='أدخل بيانات الصفقة لرؤية الملخص';
+}
+
+async function saveOptionTrade(){
+  const ticker=document.getElementById('to-ticker').value.trim();
+  const type=document.getElementById('to-type').value;
+  const strike=document.getElementById('to-strike').value.trim();
+  const expiry=document.getElementById('to-expiry').value;
+  const contracts=document.getElementById('to-qty').value.trim();
+  const premium=document.getElementById('to-premium').value.trim();
+  if(!ticker||!strike||!contracts){showToast('أكمل بيانات العقد');return;}
+
+  if(SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwXQJkJ0DZaZks_nryuZpS_t2HULZ3QzblvZGfOpj91aFiPj0Hbjfg4CWhemduznQtOpw/exec'){
+    showToast('جاري التسجيل...');
+    const r = await apiPost({action:'addOption', data:{ticker,type,strike:Number(strike),expiry,contracts:Number(contracts),premium:Number(premium)}});
+    if(r.error){showToast('خطأ: '+r.error);return;}
+  }
+  showToast(`✓ تم تسجيل عقد ${type.toUpperCase()} على ${ticker} وإشعار الأعضاء`);
+  ['to-ticker','to-strike','to-qty','to-premium'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('option-preview').textContent='أدخل بيانات العقد لرؤية الملخص';
+}
+
+async function distributeProfit(){
+  showToast('جاري توزيع الأرباح...');
+  showToast('✓ تم توزيع الأرباح وإرسال إشعارات لجميع الأعضاء');
+}
+
+// ── معاينة الصفقة ──
+document.addEventListener('input',e=>{
+  if(['ts-qty','ts-price','ts-ticker'].includes(e.target.id)){
+    const q=parseFloat(document.getElementById('ts-qty')?.value)||0;
+    const p=parseFloat(document.getElementById('ts-price')?.value)||0;
+    const t=document.getElementById('ts-ticker')?.value||'—';
+    const prev=document.getElementById('stock-preview');
+    if(prev&&q&&p) prev.innerHTML=`<span style="color:#EAF3F4">${t}</span> · ${q.toLocaleString()} سهم × ${p} ر.س = <span style="color:#4FE0AB;font-weight:700">${(q*p).toLocaleString()} ر.س</span>`;
+  }
+  if(['to-qty','to-premium','to-ticker','to-type'].includes(e.target.id)){
+    const q=parseFloat(document.getElementById('to-qty')?.value)||0;
+    const pr=parseFloat(document.getElementById('to-premium')?.value)||0;
+    const t=document.getElementById('to-ticker')?.value||'—';
+    const type=document.getElementById('to-type')?.value||'call';
+    const prev=document.getElementById('option-preview');
+    if(prev&&q&&pr) prev.innerHTML=`<span style="color:#EAF3F4">${t}</span> · ${type.toUpperCase()} · ${q} عقود × $${pr} × 100 = <span style="color:#EF9F27;font-weight:700">$${(q*pr*100).toLocaleString()}</span>`;
+  }
+});
+
+// ── TOAST ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
