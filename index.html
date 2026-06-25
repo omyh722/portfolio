@@ -1,12 +1,10 @@
-done
-TYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المحفظة المشتركة — المحفظة المشتركة</title>
+<title>المحفظة المشتركة</title>
 <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 ::selection{background:rgba(79,224,171,.25)}
@@ -16,12 +14,22 @@ body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:#091317;
 #page-member.active,#page-admin.active{flex-direction:row}
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:6px}
-#page-login{align-items:center;justify-content:center;background:radial-gradient(ellipse 80% 60% at 60% -10%,rgba(79,224,171,.1),transparent 55%),radial-gradient(ellipse 60% 50% at 5% 5%,rgba(88,185,242,.07),transparent 50%)}
-.login-card{background:#0E1D24;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 32px;width:100%;max-width:360px}
+
+/* LOGIN */
+#page-login{align-items:center;justify-content:center;background:radial-gradient(ellipse 80% 60% at 60% -10%,rgba(79,224,171,.1),transparent 55%)}
+.login-card{background:#0E1D24;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 32px;width:100%;max-width:380px}
 .login-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px}
 .login-logo span{font-family:'El Messiri',serif;font-size:26px;font-weight:700}
 .login-title{text-align:center;margin-bottom:4px;font-family:'El Messiri',serif;font-size:20px;font-weight:600}
 .login-sub{text-align:center;font-size:13px;color:#8DA2AA;margin-bottom:24px}
+.login-step{display:none}
+.login-step.active{display:block}
+.email-input-wrap{margin-bottom:16px}
+.email-input-wrap input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:13px 16px;font-family:inherit;font-size:14px;color:#EAF3F4;outline:none;transition:border-color .2s;text-align:center}
+.email-input-wrap input:focus{border-color:rgba(79,224,171,.5)}
+.email-input-wrap input::placeholder{color:#6E848C}
+.btn-primary{width:100%;background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A;border:none;padding:13px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px}
+.btn-primary:hover{opacity:.9}
 .pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:24px;height:20px;align-items:center}
 .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.2);background:transparent;transition:all .15s}
 .pin-dot.filled{background:#4FE0AB;border-color:#4FE0AB;box-shadow:0 0 8px rgba(79,224,171,.5)}
@@ -34,11 +42,13 @@ body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:#091317;
 .pin-key.del{font-size:15px;color:#8DA2AA}
 .pin-key.empty{visibility:hidden;pointer-events:none}
 .login-hint{text-align:center;font-size:12px;color:#6E848C;margin-top:8px}
-.login-demo{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);font-size:12px;color:#6E848C;text-align:center}
-.demo-btns{display:flex;gap:8px;margin-top:8px}
-.demo-btn{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9CB1B9;font-family:inherit;font-size:12px;cursor:pointer;transition:border-color .2s}
-.demo-btn:hover{border-color:rgba(255,255,255,.3);color:#EAF3F4}
-#page-member,#page-admin{flex-direction:row;min-height:100vh}
+.login-user-badge{display:flex;align-items:center;gap:10px;background:rgba(79,224,171,.08);border:1px solid rgba(79,224,171,.2);border-radius:12px;padding:10px 14px;margin-bottom:20px}
+.login-user-badge .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4FE0AB,#58B9F2);display:flex;align-items:center;justify-content:center;color:#06181A;font-weight:700;font-size:13px;flex-shrink:0}
+.login-user-badge .nm{font-size:14px;font-weight:600}
+.login-user-badge .em{font-size:11px;color:#8DA2AA}
+.btn-link{background:none;border:none;color:#58B9F2;font-family:inherit;font-size:12px;cursor:pointer;text-decoration:underline;margin-top:12px;display:block;text-align:center}
+
+/* SIDEBAR */
 .sidebar{width:252px;flex-shrink:0;background:#0B181E;border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;padding:22px 16px;position:sticky;top:0;height:100vh;overflow-y:auto}
 .sb-logo{display:flex;align-items:center;gap:9px;padding:4px 8px 24px}
 .sb-logo span{font-family:'El Messiri',serif;font-size:22px;font-weight:700}
@@ -55,21 +65,27 @@ body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:#091317;
 .sb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4FE0AB,#58B9F2);display:flex;align-items:center;justify-content:center;color:#06181A;font-weight:700;font-size:14px;flex-shrink:0}
 .sb-uname{font-size:13px;font-weight:600}
 .sb-urole{font-size:11px;color:#8DA2AA}
+.sb-preview-badge{background:rgba(239,159,39,.15);color:#EF9F27;border:1px solid rgba(239,159,39,.3);border-radius:8px;padding:6px 12px;font-size:12px;text-align:center;margin-bottom:12px}
+
+/* MAIN */
 .main{flex:1;min-width:0;overflow-y:auto;background:#091317}
 .topbar{padding:22px 30px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.06)}
 .topbar-title{font-family:'El Messiri',serif;font-size:24px;font-weight:600}
 .topbar-sub{font-size:13px;color:#8DA2AA;margin-top:3px}
 .topbar-actions{display:flex;align-items:center;gap:10px}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,.12);border-radius:11px;font-size:13px;color:#C3D2D7}
 .btn-grad{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A;border:none;padding:9px 18px;border-radius:11px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .content{padding:26px 30px 60px}
 .section{display:none}
 .section.active{display:block}
+
+/* INNER TABS */
 .inner-tabs{display:flex;gap:0;margin-bottom:20px;background:rgba(255,255,255,.04);border-radius:12px;padding:4px}
 .inner-tab{flex:1;padding:9px;text-align:center;border-radius:9px;font-size:13px;color:#8DA2AA;cursor:pointer;transition:all .15s;font-family:inherit;border:none;background:transparent}
 .inner-tab.active{background:#0E1D24;color:#EAF3F4;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .inner-section{display:none}
 .inner-section.active{display:block}
+
+/* CARDS & KPI */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
 .kpi{background:#0E1D24;border:1px solid rgba(255,255,255,.07);border-radius:17px;padding:20px}
 .kpi.highlight{background:linear-gradient(160deg,rgba(88,185,242,.12),#0E1D24);border-color:rgba(88,185,242,.3)}
@@ -78,55 +94,27 @@ body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:#091317;
 .kpi-unit{font-size:13px;color:#8DA2AA;font-weight:400}
 .kpi-change{margin-top:8px;font-size:12px;font-weight:600}
 .kpi-change.up{color:#4FE0AB}
-.kpi-change.blue{color:#58B9F2}
-.two-col{display:grid;grid-template-columns:1.65fr 1fr;gap:16px;margin-bottom:20px}
 .card{background:#0E1D24;border:1px solid rgba(255,255,255,.07);border-radius:17px;padding:22px}
 .card-title{font-size:14px;font-weight:600;margin-bottom:4px}
-.card-sub{font-size:12px;color:#8DA2AA}
-.chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
-.tabs{display:flex;gap:6px}
-.tab{padding:6px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:transparent;font-family:inherit;font-size:12px;color:#8DA2AA;cursor:pointer;transition:all .15s}
-.tab.active{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A;border-color:transparent;font-weight:600}
-.chart-wrap{position:relative;height:200px;margin-top:8px}
-.chart-labels{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:#8DA2AA}
-.alloc-row{margin-bottom:16px}
-.alloc-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
-.alloc-name{color:#C3D2D7}
-.alloc-pct{color:#8DA2AA}
-.alloc-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.06)}
-.alloc-fill{height:6px;border-radius:99px}
+
+/* TABLE */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-thead td{padding:12px 8px;color:#8DA2AA;font-size:12px;font-weight:500}
+thead td{padding:12px 8px;color:#8DA2AA;font-size:12px;font-weight:500;border-bottom:1px solid rgba(255,255,255,.06)}
 tbody tr{border-top:1px solid rgba(255,255,255,.05)}
-tbody tr.me{background:rgba(88,185,242,.05);border-top-color:rgba(79,224,171,.2)}
 tbody td{padding:13px 8px;color:#C3D2D7}
 .badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
-.badge.buy{background:rgba(79,224,171,.12);color:#4FE0AB}
-.badge.sell{background:rgba(88,185,242,.12);color:#58B9F2}
-.badge.call{background:rgba(79,224,171,.15);color:#4FE0AB}
-.badge.put{background:rgba(242,130,154,.15);color:#F2829A}
+.badge.buy,.badge.call{background:rgba(79,224,171,.12);color:#4FE0AB}
+.badge.sell,.badge.put{background:rgba(242,130,154,.12);color:#F2829A}
+.badge.closed{background:rgba(255,255,255,.06);color:#8DA2AA}
 .pos{color:#4FE0AB;font-weight:600}
 .neg{color:#F2829A;font-weight:600}
-.avatar-sm{width:30px;height:30px;border-radius:50%;background:#16323B;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#9FE9CC;vertical-align:middle;margin-left:8px}
-.avatar-sm.me{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A}
 .tag-me{font-size:10px;color:#58B9F2;border:1px solid rgba(88,185,242,.35);padding:2px 6px;border-radius:99px;margin-right:4px}
 .tag-admin{font-size:10px;color:#EF9F27;border:1px solid rgba(239,159,39,.35);padding:2px 6px;border-radius:99px;margin-right:4px}
-.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.notif-item:last-child{border-bottom:none}
-.notif-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.notif-dot.green{background:#4FE0AB}
-.notif-dot.blue{background:#58B9F2}
-.notif-dot.amber{background:#EF9F27}
-.notif-body{font-size:13px;line-height:1.6;color:#C3D2D7}
-.notif-time{font-size:11px;color:#6E848C;margin-top:3px}
-.personal-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.personal-big{background:#0E1D24;border:1px solid rgba(255,255,255,.1);border-radius:17px;padding:24px;display:flex;flex-direction:column;gap:6px}
-.big-label{font-size:12px;color:#9CB1B9}
-.big-val{font-size:32px;font-weight:700;letter-spacing:-.5px}
-.big-sub{font-size:13px;color:#58B9F2;font-weight:600}
-.deposit-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
-.deposit-row:last-child{border-bottom:none}
+.avatar-sm{width:30px;height:30px;border-radius:50%;background:#16323B;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#9FE9CC;vertical-align:middle;margin-left:6px}
+.avatar-sm.me{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A}
+
+/* FORMS */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-field{display:flex;flex-direction:column;gap:6px}
 .form-field label{font-size:12px;color:#8DA2AA}
@@ -134,131 +122,182 @@ tbody td{padding:13px 8px;color:#C3D2D7}
 .form-field input:focus,.form-field select:focus{border-color:rgba(79,224,171,.5)}
 .form-field select option{background:#0E1D24}
 .btn-action{background:linear-gradient(135deg,#4FE0AB,#58B9F2);color:#06181A;border:none;padding:11px 24px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:16px}
-.btn-action:hover{opacity:.9}
 .btn-ghost{background:transparent;color:#EAF3F4;border:1px solid rgba(255,255,255,.15);padding:11px 20px;border-radius:10px;font-family:inherit;font-size:13px;cursor:pointer}
 .btn-ghost:hover{border-color:rgba(255,255,255,.35)}
 .btn-danger{background:rgba(242,130,154,.1);color:#F2829A;border:1px solid rgba(242,130,154,.25);padding:6px 12px;border-radius:8px;font-family:inherit;font-size:12px;cursor:pointer}
 .btn-amber{background:rgba(239,159,39,.1);color:#EF9F27;border:1px solid rgba(239,159,39,.25);padding:6px 12px;border-radius:8px;font-family:inherit;font-size:12px;cursor:pointer}
+.btn-close-trade{background:rgba(242,130,154,.1);color:#F2829A;border:1px solid rgba(242,130,154,.25);padding:5px 10px;border-radius:7px;font-family:inherit;font-size:11px;cursor:pointer;white-space:nowrap}
+.btn-close-trade:hover{background:rgba(242,130,154,.2)}
+
+/* MEMBER ROW */
 .member-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .member-row:last-child{border-bottom:none}
 .member-info{flex:1}
 .member-name{font-size:14px;font-weight:600}
 .member-email{font-size:12px;color:#8DA2AA;margin-top:2px}
-.member-share{font-size:13px;color:#4FE0AB;font-weight:600}
+.member-share{font-size:13px;color:#4FE0AB;font-weight:600;margin-left:8px}
 .status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .status-dot.active{background:#4FE0AB}
 .status-dot.inactive{background:#F2829A}
+
+/* PROFIT ROW */
 .profit-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:rgba(255,255,255,.02);border-radius:10px;margin-bottom:8px}
 .profit-row.highlight{background:rgba(88,185,242,.06);border:1px solid rgba(88,185,242,.15)}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#0E1D24;border:1px solid rgba(79,224,171,.3);border-radius:12px;padding:12px 20px;font-size:13px;color:#EAF3F4;transition:transform .3s ease;z-index:999;white-space:nowrap}
+
+/* MY PORTFOLIO */
+.personal-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.personal-big{background:#0E1D24;border:1px solid rgba(255,255,255,.1);border-radius:17px;padding:24px;display:flex;flex-direction:column;gap:6px}
+.big-label{font-size:12px;color:#9CB1B9}
+.big-val{font-size:32px;font-weight:700;letter-spacing:-.5px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1000;display:none}
+.modal-overlay.show{display:flex}
+.modal{background:#0E1D24;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px;width:100%;max-width:400px;margin:16px}
+.modal-title{font-family:'El Messiri',serif;font-size:18px;font-weight:600;margin-bottom:6px}
+.modal-sub{font-size:13px;color:#8DA2AA;margin-bottom:20px}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#0E1D24;border:1px solid rgba(79,224,171,.3);border-radius:12px;padding:12px 20px;font-size:13px;color:#EAF3F4;transition:transform .3s ease;z-index:1001;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0)}
-@media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.personal-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+
+@media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr}.personal-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
 @media(max-width:640px){.sidebar{width:220px}.content{padding:16px 16px 50px}.topbar{padding:16px}}
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════ LOGIN ═══════════════════════════════════════ -->
 <div id="page-login" class="page active">
   <div class="login-card">
     <div class="login-logo">
       <svg width="32" height="32" viewBox="0 0 30 30"><defs><linearGradient id="lg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4FE0AB"/><stop offset="1" stop-color="#58B9F2"/></linearGradient></defs><path d="M3 25 L11 9 L16 18 L21 6 L27 25 Z" fill="url(#lg)"/></svg>
       <span>المحفظة المشتركة</span>
     </div>
-    <div class="login-title">مرحباً بك</div>
-    <div class="login-sub">أدخل الرمز المكوّن من 6 أرقام</div>
-    <div class="pin-dots" id="pin-dots">
-      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div><div class="pin-dot" id="d2"></div>
-      <div class="pin-dot" id="d3"></div><div class="pin-dot" id="d4"></div><div class="pin-dot" id="d5"></div>
-    </div>
-    <div class="pin-grid">
-      <button class="pin-key" onclick="pinPress('1')">1</button><button class="pin-key" onclick="pinPress('2')">2</button><button class="pin-key" onclick="pinPress('3')">3</button>
-      <button class="pin-key" onclick="pinPress('4')">4</button><button class="pin-key" onclick="pinPress('5')">5</button><button class="pin-key" onclick="pinPress('6')">6</button>
-      <button class="pin-key" onclick="pinPress('7')">7</button><button class="pin-key" onclick="pinPress('8')">8</button><button class="pin-key" onclick="pinPress('9')">9</button>
-      <button class="pin-key empty"></button><button class="pin-key" onclick="pinPress('0')">0</button><button class="pin-key del" onclick="pinDel()">⌫</button>
-    </div>
-    <div class="login-hint" id="pin-hint">أدخل رمزك للدخول</div>
-    <div class="login-demo">
-      <div>تجربة سريعة</div>
-      <div class="demo-btns">
-        <button class="demo-btn" onclick="quickLogin('member')">مشترك · 445566</button>
-        <button class="demo-btn" onclick="quickLogin('admin')">أدمن · 000000</button>
+
+    <!-- STEP 1: Email -->
+    <div class="login-step active" id="step-email">
+      <div class="login-title">مرحباً بك</div>
+      <div class="login-sub">أدخل بريدك الإلكتروني للمتابعة</div>
+      <div class="email-input-wrap">
+        <input type="email" id="email-input" placeholder="example@email.com" autocomplete="email">
       </div>
+      <button class="btn-primary" onclick="submitEmail()">متابعة</button>
+      <div class="login-hint" id="email-hint" style="margin-top:12px"></div>
+    </div>
+
+    <!-- STEP 2: PIN -->
+    <div class="login-step" id="step-pin">
+      <div id="user-badge" class="login-user-badge" style="display:none">
+        <div class="av" id="badge-av">م</div>
+        <div><div class="nm" id="badge-name"></div><div class="em" id="badge-email"></div></div>
+      </div>
+      <div class="login-title" id="pin-title">أدخل الرمز السري</div>
+      <div class="login-sub" id="pin-sub">الرمز المكوّن من 6 أرقام</div>
+      <div class="pin-dots">
+        <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div><div class="pin-dot" id="d2"></div>
+        <div class="pin-dot" id="d3"></div><div class="pin-dot" id="d4"></div><div class="pin-dot" id="d5"></div>
+      </div>
+      <div class="pin-grid">
+        <button class="pin-key" onclick="pinPress('1')">1</button><button class="pin-key" onclick="pinPress('2')">2</button><button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button><button class="pin-key" onclick="pinPress('5')">5</button><button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button><button class="pin-key" onclick="pinPress('8')">8</button><button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key empty"></button><button class="pin-key" onclick="pinPress('0')">0</button><button class="pin-key del" onclick="pinDel()">⌫</button>
+      </div>
+      <div class="login-hint" id="pin-hint">أدخل رمزك للدخول</div>
+      <button class="btn-link" onclick="backToEmail()">← تغيير البريد الإلكتروني</button>
     </div>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════ MEMBER ═══════════════════════════════════════ -->
 <div id="page-member" class="page">
   <div class="sidebar">
     <div class="sb-logo"><svg width="26" height="26" viewBox="0 0 30 30"><path d="M3 25 L11 9 L16 18 L21 6 L27 25 Z" fill="#4FE0AB"/></svg><span>المحفظة المشتركة</span></div>
+    <div id="m-preview-badge" class="sb-preview-badge" style="display:none">👁 وضع المعاينة</div>
     <div class="sb-nav">
       <div class="sb-item active" onclick="showSection('m','overview',this)"><span class="sb-dot"></span>نظرة عامة</div>
-      <div class="sb-item" onclick="showSection('m','trades',this)"><span class="sb-dot"></span>الصفقات</div>
+      <div class="sb-item" onclick="showSection('m','trades',this)"><span class="sb-dot"></span>الصفقات المفتوحة</div>
       <div class="sb-item" onclick="showSection('m','myportfolio',this)"><span class="sb-dot"></span>محفظتي</div>
-      <div class="sb-item" onclick="showSection('m','notif',this)"><span class="sb-dot"></span>الإشعارات</div>
     </div>
     <div class="sb-divider"></div>
     <div class="sb-back" onclick="logout()">← تسجيل الخروج</div>
-    <div class="sb-user"><div class="sb-avatar">م</div><div><div class="sb-uname" id="m-username">مشترك</div><div class="sb-urole">مشترك نشط</div></div></div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="m-avatar">م</div>
+      <div><div class="sb-uname" id="m-username">مشترك</div><div class="sb-urole">مشترك نشط</div></div>
+    </div>
   </div>
   <div class="main">
+    <!-- نظرة عامة -->
     <div id="m-section-overview" class="section active">
-      <div class="topbar"><div><div class="topbar-title">المحفظة المشتركة</div><div class="topbar-sub">بيانات حقيقية من الشيت</div></div></div>
+      <div class="topbar"><div><div class="topbar-title">المحفظة المشتركة</div><div class="topbar-sub" id="m-last-update">جاري التحميل...</div></div></div>
       <div class="content">
         <div class="kpi-grid">
-          <div class="kpi"><div class="kpi-label">القيمة الإجمالية</div><div class="kpi-val" id="kpi-total-capital">— <span class="kpi-unit">ر.س</span></div></div>
-          <div class="kpi"><div class="kpi-label">إجمالي الأرباح</div><div class="kpi-val" id="kpi-total-pnl">—</div></div>
-          <div class="kpi"><div class="kpi-label">العائد %</div><div class="kpi-val" id="kpi-pnl-pct" style="color:#4FE0AB">—</div></div>
-          <div class="kpi highlight"><div class="kpi-label">عدد الأعضاء النشطين</div><div class="kpi-val" id="kpi-active-members">—</div></div>
+          <div class="kpi"><div class="kpi-label">إجمالي رأس المال</div><div class="kpi-val"><span id="m-kpi-capital">—</span> <span class="kpi-unit">ر.س</span></div></div>
+          <div class="kpi"><div class="kpi-label">إجمالي الأرباح المحققة</div><div class="kpi-val"><span id="m-kpi-pnl" style="color:#4FE0AB">—</span> <span class="kpi-unit">ر.س</span></div></div>
+          <div class="kpi"><div class="kpi-label">العائد الكلي %</div><div class="kpi-val" id="m-kpi-pct" style="color:#4FE0AB">—</div></div>
+          <div class="kpi highlight"><div class="kpi-label">الصفقات المفتوحة</div><div class="kpi-val" id="m-kpi-open">—</div></div>
         </div>
         <div class="card">
-          <div class="card-title" style="margin-bottom:14px">المشتركون وحصصهم</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="card-title">آخر الصفقات المفتوحة</div>
+            <span style="font-size:12px;color:#58B9F2;cursor:pointer" onclick="showSection('m','trades',document.querySelectorAll('#page-member .sb-item')[1])">عرض الكل ←</span>
+          </div>
           <div class="tbl-wrap"><table>
-            <thead><tr><td>المساهم</td><td>المساهمة</td><td>الحصة</td><td>الحالة</td></tr></thead>
-            <tbody id="members-tbody"><tr><td colspan="4" style="text-align:center;color:#8DA2AA">جاري التحميل...</td></tr></tbody>
+            <thead><tr><td>الأصل</td><td>النوع</td><td>التفاصيل</td><td>التاريخ</td></tr></thead>
+            <tbody id="m-open-trades-preview"><tr><td colspan="4" style="text-align:center;color:#8DA2AA;padding:20px">جاري التحميل...</td></tr></tbody>
           </table></div>
         </div>
       </div>
     </div>
+
+    <!-- الصفقات المفتوحة -->
     <div id="m-section-trades" class="section">
-      <div class="topbar"><div><div class="topbar-title">الصفقات</div></div></div>
+      <div class="topbar"><div><div class="topbar-title">الصفقات المفتوحة</div><div class="topbar-sub">الأسهم والعقود النشطة حالياً</div></div></div>
       <div class="content">
         <div class="inner-tabs">
           <button class="inner-tab active" onclick="showInner('m-trades','stocks',this)">📈 الأسهم</button>
           <button class="inner-tab" onclick="showInner('m-trades','options',this)">⚡ الأوبشن</button>
         </div>
         <div id="m-trades-stocks" class="inner-section active">
-          <div class="card"><div class="card-title" style="margin-bottom:14px">سجل صفقات الأسهم</div>
+          <div class="card"><div class="card-title" style="margin-bottom:14px">الأسهم المفتوحة</div>
             <div class="tbl-wrap"><table>
-              <thead><tr><td>السهم</td><td>النوع</td><td>الكمية</td><td>السعر</td><td>الأثر</td><td>التاريخ</td></tr></thead>
-              <tbody id="stocks-tbody"><tr><td colspan="6" style="text-align:center;color:#8DA2AA">جاري التحميل...</td></tr></tbody>
+              <thead><tr><td>السهم</td><td>النوع</td><td>الكمية</td><td>سعر الدخول</td><td>التاريخ</td></tr></thead>
+              <tbody id="m-stocks-open"><tr><td colspan="5" style="text-align:center;color:#8DA2AA;padding:20px">جاري التحميل...</td></tr></tbody>
             </table></div>
           </div>
         </div>
         <div id="m-trades-options" class="inner-section">
-          <div class="card"><div class="card-title" style="margin-bottom:14px">سجل عقود الأوبشن</div>
+          <div class="card"><div class="card-title" style="margin-bottom:14px">عقود الأوبشن المفتوحة</div>
             <div class="tbl-wrap"><table>
-              <thead><tr><td>الأصل</td><td>النوع</td><td>Strike</td><td>الانتهاء</td><td>العقود</td><td>الأثر</td></tr></thead>
-              <tbody id="options-tbody"><tr><td colspan="6" style="text-align:center;color:#8DA2AA">جاري التحميل...</td></tr></tbody>
+              <thead><tr><td>الأصل</td><td>النوع</td><td>Strike</td><td>الانتهاء</td><td>العقود</td></tr></thead>
+              <tbody id="m-options-open"><tr><td colspan="5" style="text-align:center;color:#8DA2AA;padding:20px">جاري التحميل...</td></tr></tbody>
             </table></div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- محفظتي -->
     <div id="m-section-myportfolio" class="section">
-      <div class="topbar"><div><div class="topbar-title">محفظتي الشخصية</div></div></div>
+      <div class="topbar"><div><div class="topbar-title">محفظتي الشخصية</div><div class="topbar-sub">بياناتك الخاصة</div></div></div>
       <div class="content">
         <div class="personal-grid">
-          <div class="personal-big"><div class="big-label">إجمالي استثماري</div><div class="big-val" id="my-amount">—</div></div>
-          <div class="personal-big" style="border-color:rgba(79,224,171,.25)"><div class="big-label">حصتي %</div><div class="big-val" id="my-pct" style="color:#4FE0AB">—</div></div>
+          <div class="personal-big"><div class="big-label">إجمالي استثماري</div><div class="big-val"><span id="my-amount">—</span> <span style="font-size:16px;color:#9CB1B9;font-weight:400">ر.س</span></div><div style="font-size:12px;color:#8DA2AA;margin-top:4px" id="my-join-date"></div></div>
+          <div class="personal-big" style="border-color:rgba(79,224,171,.25)"><div class="big-label">أرباحي المحققة</div><div class="big-val" style="color:#4FE0AB"><span id="my-profit">—</span> <span style="font-size:16px;color:#9CB1B9;font-weight:400">ر.س</span></div><div style="font-size:12px;color:#4FE0AB;margin-top:4px" id="my-return-pct"></div></div>
+        </div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi"><div class="kpi-label">حصتي من المحفظة</div><div class="kpi-val" id="my-share-pct">—</div></div>
+          <div class="kpi"><div class="kpi-label">الصفقات المفتوحة</div><div class="kpi-val" id="my-open-count">—</div></div>
+          <div class="kpi"><div class="kpi-label">الصفقات المغلقة</div><div class="kpi-val" id="my-closed-count">—</div></div>
         </div>
       </div>
-    </div>
-    <div id="m-section-notif" class="section">
-      <div class="topbar"><div><div class="topbar-title">الإشعارات</div></div></div>
-      <div class="content"><div class="card"><div class="notif-item"><span class="notif-dot green"></span><div><div class="notif-body">مرحباً! الإشعارات ستظهر هنا عند تسجيل صفقات جديدة.</div></div></div></div></div>
     </div>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════ ADMIN ═══════════════════════════════════════ -->
 <div id="page-admin" class="page">
   <div class="sidebar">
     <div class="sb-logo"><svg width="26" height="26" viewBox="0 0 30 30"><path d="M3 25 L11 9 L16 18 L21 6 L27 25 Z" fill="#4FE0AB"/></svg><span>المحفظة المشتركة</span></div>
@@ -266,49 +305,74 @@ tbody td{padding:13px 8px;color:#C3D2D7}
       <div class="sb-item active" onclick="showSection('a','overview',this)"><span class="sb-dot"></span>نظرة عامة</div>
       <div class="sb-item" onclick="showSection('a','members',this)"><span class="sb-dot"></span>إدارة الأعضاء</div>
       <div class="sb-item" onclick="showSection('a','trades',this)"><span class="sb-dot"></span>إدخال الصفقات</div>
+      <div class="sb-item" onclick="showSection('a','open',this)"><span class="sb-dot"></span>الصفقات المفتوحة</div>
       <div class="sb-item" onclick="showSection('a','profits',this)"><span class="sb-dot"></span>توزيع الأرباح</div>
     </div>
     <div class="sb-divider"></div>
+    <div class="sb-back" onclick="previewMember()">👁 معاينة واجهة المشترك</div>
+    <div class="sb-divider"></div>
     <div class="sb-back" onclick="logout()">← تسجيل الخروج</div>
-    <div class="sb-user"><div class="sb-avatar" style="font-size:11px">ADM</div><div><div class="sb-uname">عمر (أدمن)</div><div class="sb-urole" style="color:#EF9F27">صلاحيات كاملة</div></div></div>
+    <div class="sb-user">
+      <div class="sb-avatar" style="font-size:11px;background:linear-gradient(135deg,#EF9F27,#F2829A)">ADM</div>
+      <div><div class="sb-uname" id="a-username">أدمن</div><div class="sb-urole" style="color:#EF9F27">صلاحيات كاملة</div></div>
+    </div>
   </div>
   <div class="main">
+
+    <!-- نظرة عامة أدمن -->
     <div id="a-section-overview" class="section active">
       <div class="topbar">
-        <div><div class="topbar-title">لوحة الأدمن</div><div class="topbar-sub">بيانات حقيقية من الشيت</div></div>
+        <div><div class="topbar-title">لوحة الأدمن</div><div class="topbar-sub">إدارة المحفظة المشتركة</div></div>
         <div class="topbar-actions"><button class="btn-grad" onclick="showSection('a','trades',document.querySelectorAll('#page-admin .sb-item')[2])">+ صفقة جديدة</button></div>
       </div>
       <div class="content">
         <div class="kpi-grid">
-          <div class="kpi"><div class="kpi-label">القيمة الإجمالية</div><div class="kpi-val" id="a-kpi-capital">— <span class="kpi-unit">ر.س</span></div></div>
-          <div class="kpi"><div class="kpi-label">إجمالي الأرباح</div><div class="kpi-val" id="a-kpi-pnl">—</div></div>
+          <div class="kpi"><div class="kpi-label">إجمالي رأس المال</div><div class="kpi-val"><span id="a-kpi-capital">—</span> <span class="kpi-unit">ر.س</span></div></div>
+          <div class="kpi"><div class="kpi-label">إجمالي الأرباح المحققة</div><div class="kpi-val" style="color:#4FE0AB"><span id="a-kpi-pnl">—</span> <span class="kpi-unit">ر.س</span></div></div>
           <div class="kpi"><div class="kpi-label">الأعضاء النشطين</div><div class="kpi-val" id="a-kpi-members">—</div></div>
-          <div class="kpi"><div class="kpi-label">إجمالي الصفقات</div><div class="kpi-val" id="a-kpi-trades">—</div></div>
+          <div class="kpi"><div class="kpi-label">الصفقات المفتوحة</div><div class="kpi-val" id="a-kpi-open">—</div></div>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="card-title">المشتركون وحصصهم</div>
+            <span style="font-size:12px;color:#58B9F2;cursor:pointer" onclick="showSection('a','members',document.querySelectorAll('#page-admin .sb-item')[1])">إدارة الأعضاء ←</span>
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><td>المساهم</td><td>الإيميل</td><td>المساهمة</td><td>الحصة</td><td>الأرباح المحققة</td><td>الحالة</td></tr></thead>
+            <tbody id="a-members-overview"><tr><td colspan="6" style="text-align:center;color:#8DA2AA;padding:20px">جاري التحميل...</td></tr></tbody>
+          </table></div>
         </div>
         <div class="card">
-          <div class="card-title" style="margin-bottom:14px">المشتركون</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="card-title">الصفقات المفتوحة</div>
+            <span style="font-size:12px;color:#58B9F2;cursor:pointer" onclick="showSection('a','open',document.querySelectorAll('#page-admin .sb-item')[3])">عرض الكل ←</span>
+          </div>
           <div class="tbl-wrap"><table>
-            <thead><tr><td>المساهم</td><td>المساهمة</td><td>الحصة</td><td>الدور</td><td>الحالة</td></tr></thead>
-            <tbody id="a-members-tbody"><tr><td colspan="5" style="text-align:center;color:#8DA2AA">جاري التحميل...</td></tr></tbody>
+            <thead><tr><td>الأصل</td><td>النوع</td><td>التفاصيل</td><td>التاريخ</td><td>إجراء</td></tr></thead>
+            <tbody id="a-open-preview"><tr><td colspan="5" style="text-align:center;color:#8DA2AA;padding:20px">جاري التحميل...</td></tr></tbody>
           </table></div>
         </div>
       </div>
     </div>
 
+    <!-- إدارة الأعضاء -->
     <div id="a-section-members" class="section">
-      <div class="topbar"><div><div class="topbar-title">إدارة الأعضاء</div></div><button class="btn-grad" onclick="showAddMember()">+ إضافة عضو</button></div>
+      <div class="topbar"><div><div class="topbar-title">إدارة الأعضاء</div></div><button class="btn-grad" onclick="toggleAddMember()">+ إضافة عضو</button></div>
       <div class="content">
-        <div class="card" style="margin-bottom:20px;display:none" id="add-member-card">
+        <div class="card" id="add-member-card" style="display:none;margin-bottom:20px">
           <div class="card-title" style="margin-bottom:16px">إضافة عضو جديد</div>
           <div class="form-grid">
-            <div class="form-field"><label>الاسم الكامل</label><input type="text" id="new-name" placeholder="مثال: أحمد محمد"></div>
+            <div class="form-field"><label>الاسم الكامل</label><input type="text" id="new-name" placeholder="أحمد محمد"></div>
             <div class="form-field"><label>البريد الإلكتروني</label><input type="email" id="new-email" placeholder="ahmed@email.com"></div>
-            <div class="form-field"><label>الرمز السري 6 أرقام</label><input type="text" id="new-pin" placeholder="مثال: 247813" maxlength="6"></div>
+            <div class="form-field"><label>الرمز السري (6 أرقام)</label><input type="text" id="new-pin" placeholder="123456" maxlength="6"></div>
             <div class="form-field"><label>مبلغ المساهمة (ر.س)</label><input type="number" id="new-amount" placeholder="100000"></div>
             <div class="form-field"><label>تاريخ الانضمام</label><input type="date" id="new-date"></div>
             <div class="form-field"><label>الصلاحية</label><select id="new-role"><option value="member">مشترك عادي</option><option value="admin">أدمن</option></select></div>
           </div>
-          <div style="display:flex;gap:10px;margin-top:16px"><button class="btn-action" onclick="addMember()">إضافة</button><button class="btn-ghost" onclick="hideAddMember()">إلغاء</button></div>
+          <div style="display:flex;gap:10px;margin-top:16px">
+            <button class="btn-action" onclick="addMember()">إضافة العضو</button>
+            <button class="btn-ghost" onclick="toggleAddMember()">إلغاء</button>
+          </div>
         </div>
         <div class="card">
           <div class="card-title" style="margin-bottom:16px">قائمة الأعضاء</div>
@@ -317,6 +381,7 @@ tbody td{padding:13px 8px;color:#C3D2D7}
       </div>
     </div>
 
+    <!-- إدخال صفقة -->
     <div id="a-section-trades" class="section">
       <div class="topbar"><div><div class="topbar-title">إدخال الصفقات</div></div></div>
       <div class="content">
@@ -326,47 +391,138 @@ tbody td{padding:13px 8px;color:#C3D2D7}
         </div>
         <div id="a-trades-stocks" class="inner-section active">
           <div class="card">
-            <div class="card-title" style="margin-bottom:16px">تسجيل صفقة أسهم</div>
+            <div class="card-title" style="margin-bottom:16px">تسجيل صفقة أسهم جديدة</div>
             <div class="form-grid">
               <div class="form-field"><label>رمز السهم</label><input type="text" id="ts-ticker" placeholder="2222 أو AAPL"></div>
               <div class="form-field"><label>اسم الشركة</label><input type="text" id="ts-name" placeholder="أرامكو السعودية"></div>
               <div class="form-field"><label>نوع الصفقة</label><select id="ts-type"><option value="buy">شراء</option><option value="sell">بيع</option></select></div>
               <div class="form-field"><label>الكمية</label><input type="number" id="ts-qty" placeholder="1000"></div>
-              <div class="form-field"><label>سعر السهم (ر.س)</label><input type="number" id="ts-price" placeholder="28.50" step="0.01"></div>
+              <div class="form-field"><label>سعر الدخول (ر.س)</label><input type="number" id="ts-price" placeholder="28.50" step="0.01"></div>
               <div class="form-field"><label>التاريخ</label><input type="date" id="ts-date"></div>
             </div>
-            <div style="margin-top:16px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;font-size:13px;color:#8DA2AA" id="stock-preview">أدخل بيانات الصفقة لرؤية الملخص</div>
-            <button class="btn-action" onclick="saveStockTrade()">تسجيل في الشيت</button>
+            <div id="stock-preview" style="margin-top:16px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;font-size:13px;color:#8DA2AA">أدخل بيانات الصفقة لرؤية الملخص</div>
+            <button class="btn-action" onclick="saveStockTrade()">تسجيل الصفقة</button>
           </div>
         </div>
         <div id="a-trades-options" class="inner-section">
           <div class="card">
-            <div class="card-title" style="margin-bottom:16px">تسجيل عقد أوبشن</div>
+            <div class="card-title" style="margin-bottom:16px">تسجيل عقد أوبشن جديد</div>
             <div class="form-grid">
               <div class="form-field"><label>الأصل (Ticker)</label><input type="text" id="to-ticker" placeholder="NVDA أو SPY"></div>
-              <div class="form-field"><label>نوع العقد</label><select id="to-type"><option value="call">CALL</option><option value="put">PUT</option></select></div>
-              <div class="form-field"><label>Strike</label><input type="number" id="to-strike" placeholder="130" step="0.5"></div>
+              <div class="form-field"><label>نوع العقد</label><select id="to-type"><option value="call">CALL (توقع صعود)</option><option value="put">PUT (توقع هبوط)</option></select></div>
+              <div class="form-field"><label>Strike Price</label><input type="number" id="to-strike" placeholder="130" step="0.5"></div>
               <div class="form-field"><label>تاريخ الانتهاء</label><input type="date" id="to-expiry"></div>
               <div class="form-field"><label>عدد العقود</label><input type="number" id="to-qty" placeholder="5" min="1"></div>
               <div class="form-field"><label>سعر العقد ($)</label><input type="number" id="to-premium" placeholder="4.20" step="0.01"></div>
             </div>
-            <div style="margin-top:16px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;font-size:13px;color:#8DA2AA" id="option-preview">أدخل بيانات العقد لرؤية الملخص</div>
-            <button class="btn-action" onclick="saveOptionTrade()">تسجيل في الشيت</button>
+            <div id="option-preview" style="margin-top:16px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;font-size:13px;color:#8DA2AA">أدخل بيانات العقد لرؤية الملخص</div>
+            <button class="btn-action" onclick="saveOptionTrade()">تسجيل العقد</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="a-section-profits" class="section">
-      <div class="topbar"><div><div class="topbar-title">توزيع الأرباح</div></div></div>
+    <!-- الصفقات المفتوحة (أدمن) -->
+    <div id="a-section-open" class="section">
+      <div class="topbar"><div><div class="topbar-title">الصفقات المفتوحة</div><div class="topbar-sub">اضغط إغلاق لتسجيل سعر البيع</div></div></div>
       <div class="content">
-        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
-          <div class="kpi"><div class="kpi-label">إجمالي الأرباح</div><div class="kpi-val" id="p-total-pnl">—</div></div>
-          <div class="kpi"><div class="kpi-label">الأعضاء النشطين</div><div class="kpi-val" id="p-members">—</div></div>
-          <div class="kpi"><div class="kpi-label">العائد %</div><div class="kpi-val" id="p-pct" style="color:#4FE0AB">—</div></div>
+        <div class="inner-tabs">
+          <button class="inner-tab active" onclick="showInner('a-open','stocks',this)">📈 الأسهم</button>
+          <button class="inner-tab" onclick="showInner('a-open','options',this)">⚡ الأوبشن</button>
+        </div>
+        <div id="a-open-stocks" class="inner-section active">
+          <div class="card"><div class="card-title" style="margin-bottom:14px">الأسهم المفتوحة</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><td>السهم</td><td>النوع</td><td>الكمية</td><td>سعر الدخول</td><td>التاريخ</td><td>إغلاق</td></tr></thead>
+              <tbody id="a-stocks-open"><tr><td colspan="6" style="text-align:center;color:#8DA2AA;padding:20px">جاري التحميل...</td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+        <div id="a-open-options" class="inner-section">
+          <div class="card"><div class="card-title" style="margin-bottom:14px">عقود الأوبشن المفتوحة</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><td>الأصل</td><td>النوع</td><td>Strike</td><td>الانتهاء</td><td>العقود</td><td>إغلاق</td></tr></thead>
+              <tbody id="a-options-open"><tr><td colspan="6" style="text-align:center;color:#8DA2AA;padding:20px">جاري التحميل...</td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- توزيع الأرباح -->
+    <div id="a-section-profits" class="section">
+      <div class="topbar"><div><div class="topbar-title">توزيع الأرباح</div><div class="topbar-sub">محسوب من تاريخ انضمام كل عضو</div></div></div>
+      <div class="content">
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+          <div class="kpi"><div class="kpi-label">إجمالي الأرباح المحققة</div><div class="kpi-val"><span id="p-total-pnl" style="color:#4FE0AB">—</span> <span class="kpi-unit">ر.س</span></div></div>
+          <div class="kpi"><div class="kpi-label">رأس المال الكلي</div><div class="kpi-val"><span id="p-capital">—</span> <span class="kpi-unit">ر.س</span></div></div>
+          <div class="kpi"><div class="kpi-label">العائد الكلي</div><div class="kpi-val" id="p-pct" style="color:#4FE0AB">—</div></div>
         </div>
         <div class="card" id="profit-distribution"><div style="color:#8DA2AA;text-align:center;padding:20px">جاري التحميل...</div></div>
       </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ MODALS ═══════════════════════════════════════ -->
+
+<!-- Modal إغلاق سهم -->
+<div class="modal-overlay" id="modal-close-stock">
+  <div class="modal">
+    <div class="modal-title">إغلاق صفقة السهم</div>
+    <div class="modal-sub" id="modal-stock-info">تفاصيل الصفقة</div>
+    <div class="form-field">
+      <label>سعر البيع (ر.س)</label>
+      <input type="number" id="close-stock-price" placeholder="0.00" step="0.01">
+    </div>
+    <div id="close-stock-calc" style="margin-top:12px;padding:12px;background:rgba(255,255,255,.03);border-radius:10px;font-size:13px;color:#8DA2AA"></div>
+    <div class="modal-actions">
+      <button class="btn-action" onclick="confirmCloseStock()">تأكيد الإغلاق</button>
+      <button class="btn-ghost" onclick="closeModal('modal-close-stock')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal إغلاق أوبشن -->
+<div class="modal-overlay" id="modal-close-option">
+  <div class="modal">
+    <div class="modal-title">إغلاق عقد الأوبشن</div>
+    <div class="modal-sub" id="modal-option-info">تفاصيل العقد</div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-field">
+        <label>سعر الإغلاق ($)</label>
+        <input type="number" id="close-option-price" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-field">
+        <label>سبب الإغلاق</label>
+        <select id="close-option-reason">
+          <option value="sold">بيع العقد</option>
+          <option value="expired">انتهاء العقد (صفر)</option>
+          <option value="exercised">تنفيذ العقد</option>
+        </select>
+      </div>
+    </div>
+    <div id="close-option-calc" style="margin-top:12px;padding:12px;background:rgba(255,255,255,.03);border-radius:10px;font-size:13px;color:#8DA2AA"></div>
+    <div class="modal-actions">
+      <button class="btn-action" onclick="confirmCloseOption()">تأكيد الإغلاق</button>
+      <button class="btn-ghost" onclick="closeModal('modal-close-option')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal تغيير رمز عضو -->
+<div class="modal-overlay" id="modal-change-pin">
+  <div class="modal">
+    <div class="modal-title">تغيير الرمز السري</div>
+    <div class="modal-sub" id="modal-pin-member-name">اسم العضو</div>
+    <div class="form-field">
+      <label>الرمز الجديد (6 أرقام)</label>
+      <input type="text" id="new-pin-value" placeholder="123456" maxlength="6">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-action" onclick="confirmChangePin()">حفظ الرمز</button>
+      <button class="btn-ghost" onclick="closeModal('modal-change-pin')">إلغاء</button>
     </div>
   </div>
 </div>
@@ -376,219 +532,638 @@ tbody td{padding:13px 8px;color:#C3D2D7}
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFTM7y2nAhpiJAlQERTda9HSQzszeYzq0quk23rIcXINPJzM1v8HWy_R4cFPDYGcZgsQ/exec';
 
+// ── API ──
 async function api(action, params={}) {
   const url = SCRIPT_URL + '?action=' + action + '&' + new URLSearchParams(params);
-  try { const res = await fetch(url); return await res.json(); }
-  catch(e) { return { error: 'فشل الاتصال' }; }
+  try { const r = await fetch(url); return await r.json(); } catch(e) { return {error:'فشل الاتصال'}; }
 }
 async function apiPost(body) {
-  try { const res = await fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(body) }); return await res.json(); }
-  catch(e) { return { error: 'فشل الاتصال' }; }
+  try { const r = await fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify(body)}); return await r.json(); } catch(e) { return {error:'فشل الاتصال'}; }
 }
 
-let currentUser = null, pin = '';
+// ── الحالة ──
+let currentUser = null, pin = '', pendingEmail = null, pendingUser = null;
+let allMembers = [], allStocks = [], allOptions = [];
+let closingStockId = null, closingOptionId = null, changingPinId = null;
 
-function pinPress(d){ if(pin.length>=6)return; pin+=d; updateDots(); if(pin.length===6) setTimeout(doLogin,200); }
-function pinDel(){ pin=pin.slice(0,-1); updateDots(); for(let i=0;i<6;i++) document.getElementById('d'+i).classList.remove('error'); }
-function updateDots(){ for(let i=0;i<6;i++){ const d=document.getElementById('d'+i); d.classList.toggle('filled',i<pin.length); d.classList.remove('error'); } }
+// ════════════════════════════════════════
+//  LOGIN — STEP 1: Email
+// ════════════════════════════════════════
+async function submitEmail() {
+  const email = document.getElementById('email-input').value.trim().toLowerCase();
+  const hint = document.getElementById('email-hint');
+  if (!email || !email.includes('@')) { hint.textContent = 'أدخل بريداً إلكترونياً صحيحاً'; hint.style.color = '#F2829A'; return; }
+  hint.textContent = 'جاري التحقق...'; hint.style.color = '#8DA2AA';
 
-async function doLogin(){
-  const hint=document.getElementById('pin-hint');
-  hint.textContent='جاري التحقق...'; hint.style.color='#8DA2AA';
-  const result = await api('login', {pin});
-  if(result.success){
-    currentUser = result.user;
-    hint.textContent=`مرحباً ${result.user.name}!`; hint.style.color='#4FE0AB';
-    setTimeout(()=>{ loginAs(result.user.role); loadDashboardData(result.user.role); }, 400);
-  } else {
-    for(let i=0;i<6;i++) document.getElementById('d'+i).classList.add('error');
-    hint.textContent='رمز خاطئ، حاول مجدداً'; hint.style.color='#F2829A';
-    setTimeout(()=>{ pin=''; updateDots(); hint.textContent='أدخل رمزك للدخول'; hint.style.color=''; },800);
+  // تحقق من الشيت
+  const result = await api('findByEmail', {email});
+  if (result.error || !result.found) {
+    hint.textContent = 'البريد غير مسجل في المحفظة'; hint.style.color = '#F2829A'; return;
+  }
+  if (result.user.status === 'inactive') {
+    hint.textContent = 'هذا الحساب معطّل، تواصل مع الأدمن'; hint.style.color = '#F2829A'; return;
+  }
+
+  pendingUser = result.user;
+  pendingEmail = email;
+
+  // عرض بادج المستخدم
+  document.getElementById('badge-av').textContent = result.user.name?.slice(0,1) || 'م';
+  document.getElementById('badge-name').textContent = result.user.name;
+  document.getElementById('badge-email').textContent = email;
+  document.getElementById('user-badge').style.display = 'flex';
+
+  // انتقل لخطوة الرمز
+  document.getElementById('step-email').classList.remove('active');
+  document.getElementById('step-pin').classList.add('active');
+  document.getElementById('pin-hint').textContent = 'أدخل رمزك السري';
+  document.getElementById('pin-hint').style.color = '';
+}
+
+function backToEmail() {
+  pin = ''; updateDots();
+  document.getElementById('step-pin').classList.remove('active');
+  document.getElementById('step-email').classList.add('active');
+  document.getElementById('email-hint').textContent = '';
+  pendingUser = null; pendingEmail = null;
+}
+
+document.getElementById('email-input').addEventListener('keydown', e => { if(e.key==='Enter') submitEmail(); });
+
+// ════════════════════════════════════════
+//  LOGIN — STEP 2: PIN
+// ════════════════════════════════════════
+function pinPress(d) {
+  if (pin.length >= 6) return;
+  pin += d; updateDots();
+  if (pin.length === 6) setTimeout(doLogin, 200);
+}
+function pinDel() {
+  pin = pin.slice(0,-1); updateDots();
+  for(let i=0;i<6;i++) document.getElementById('d'+i).classList.remove('error');
+}
+function updateDots() {
+  for(let i=0;i<6;i++){
+    const d=document.getElementById('d'+i);
+    d.classList.toggle('filled',i<pin.length);
+    d.classList.remove('error');
   }
 }
 
-function quickLogin(role){ pin=role==='admin'?'000000':'445566'; updateDots(); setTimeout(doLogin,200); }
+async function doLogin() {
+  const hint = document.getElementById('pin-hint');
+  hint.textContent = 'جاري التحقق...'; hint.style.color = '#8DA2AA';
 
-function loginAs(role){
-  document.getElementById('page-login').classList.remove('active'); pin=''; updateDots();
-  if(role==='admin'){ document.getElementById('page-admin').classList.add('active'); }
-  else { document.getElementById('page-member').classList.add('active'); if(document.getElementById('m-username')) document.getElementById('m-username').textContent=currentUser?.name||''; }
+  // تحقق من الرمز
+  const result = await api('login', {pin, email: pendingUser?.email || ''});
+
+  if (!result.success) {
+    for(let i=0;i<6;i++) document.getElementById('d'+i).classList.add('error');
+    hint.textContent = 'رمز خاطئ، حاول مجدداً'; hint.style.color = '#F2829A';
+    setTimeout(() => { pin=''; updateDots(); hint.textContent='أدخل رمزك السري'; hint.style.color=''; }, 800);
+    return;
+  }
+
+  currentUser = result.user;
+  hint.textContent = `مرحباً ${result.user.name}!`; hint.style.color = '#4FE0AB';
+  setTimeout(() => { enterDashboard(result.user.role); }, 400);
 }
 
-function logout(){
+function enterDashboard(role) {
+  document.getElementById('page-login').classList.remove('active');
+  pin = ''; updateDots();
+  pendingEmail = null; pendingUser = null;
+  document.getElementById('email-input').value = '';
+
+  if (role === 'admin') {
+    document.getElementById('page-admin').classList.add('active');
+    document.getElementById('a-username').textContent = currentUser.name + ' (أدمن)';
+    loadAdminData();
+  } else {
+    document.getElementById('page-member').classList.add('active');
+    document.getElementById('m-username').textContent = currentUser.name;
+    document.getElementById('m-avatar').textContent = currentUser.name?.slice(0,1) || 'م';
+    document.getElementById('m-preview-badge').style.display = 'none';
+    loadMemberData();
+  }
+}
+
+function logout() {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-login').classList.add('active');
-  currentUser=null; pin=''; updateDots();
+  document.getElementById('step-pin').classList.remove('active');
+  document.getElementById('step-email').classList.add('active');
+  currentUser = null; pin = ''; updateDots();
+  allMembers=[]; allStocks=[]; allOptions=[];
 }
 
-document.addEventListener('keydown',e=>{
-  if(document.getElementById('page-login').classList.contains('active')){
-    if(e.key>='0'&&e.key<='9') pinPress(e.key);
-    if(e.key==='Backspace') pinDel();
+// معاينة واجهة المشترك من الأدمن
+function previewMember() {
+  document.getElementById('page-admin').classList.remove('active');
+  document.getElementById('page-member').classList.add('active');
+  document.getElementById('m-username').textContent = currentUser.name + ' (معاينة)';
+  document.getElementById('m-avatar').textContent = currentUser.name?.slice(0,1) || 'أ';
+  document.getElementById('m-preview-badge').style.display = 'block';
+  loadMemberData();
+}
+
+// زر الرجوع للأدمن من المعاينة
+function logout() {
+  if (currentUser?.role === 'admin' && document.getElementById('page-member').classList.contains('active')) {
+    document.getElementById('page-member').classList.remove('active');
+    document.getElementById('page-admin').classList.add('active');
+    return;
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-login').classList.add('active');
+  document.getElementById('step-pin').classList.remove('active');
+  document.getElementById('step-email').classList.add('active');
+  currentUser = null; pin = ''; updateDots();
+  allMembers=[]; allStocks=[]; allOptions=[];
+}
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('page-login').classList.contains('active') &&
+      document.getElementById('step-pin').classList.contains('active')) {
+    if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+    if (e.key === 'Backspace') pinDel();
   }
 });
 
-async function loadDashboardData(role){
+// ════════════════════════════════════════
+//  تحميل البيانات
+// ════════════════════════════════════════
+const fmt = n => Number(n).toLocaleString('ar-SA');
+
+async function loadAdminData() {
   showToast('جاري تحميل البيانات...');
-  const fmt = n => Number(n).toLocaleString('ar-SA');
   try {
     const [summary, members, stocks, options] = await Promise.all([
       api('getSummary'), api('getMembers'), api('getStocks'), api('getOptions')
     ]);
-    if(!summary.error){
-      const s = summary;
-      safeSet('kpi-total-capital', fmt(s.totalCapital)+' ر.س');
-      safeSet('kpi-total-pnl', (s.totalPnl>=0?'+':'')+fmt(s.totalPnl)+' ر.س');
-      safeSet('kpi-pnl-pct', s.pnlPct+'%');
-      safeSet('kpi-active-members', s.activeMembers);
-      safeSet('a-kpi-capital', fmt(s.totalCapital)+' ر.س');
-      safeSet('a-kpi-pnl', (s.totalPnl>=0?'+':'')+fmt(s.totalPnl)+' ر.س');
-      safeSet('a-kpi-members', s.activeMembers);
-      safeSet('a-kpi-trades', (s.stockTrades||0)+(s.optionTrades||0));
-      safeSet('p-total-pnl', (s.totalPnl>=0?'+':'')+fmt(s.totalPnl)+' ر.س');
-      safeSet('p-members', s.activeMembers);
-      safeSet('p-pct', s.pnlPct+'%');
+
+    if (members.rows) allMembers = members.rows;
+    if (stocks.rows) allStocks = stocks.rows;
+    if (options.rows) allOptions = options.rows;
+
+    // KPIs
+    if (!summary.error) {
+      safeSet('a-kpi-capital', fmt(summary.totalCapital));
+      safeSet('a-kpi-pnl', (summary.totalPnl>=0?'+':'')+fmt(summary.totalPnl));
+      safeSet('a-kpi-members', summary.activeMembers);
+      const openCount = allStocks.filter(r=>r.status==='open').length + allOptions.filter(r=>r.status==='open').length;
+      safeSet('a-kpi-open', openCount);
+      safeSet('p-total-pnl', (summary.totalPnl>=0?'+':'')+fmt(summary.totalPnl));
+      safeSet('p-capital', fmt(summary.totalCapital));
+      safeSet('p-pct', summary.pnlPct+'%');
     }
-    if(members.rows){
-      const totalCap = members.rows.filter(r=>r.status==='active').reduce((s,r)=>s+Number(r.amount),0);
-      const mTbody = document.getElementById('members-tbody');
-      const aTbody = document.getElementById('a-members-tbody');
-      const mHtml = members.rows.map(r=>{
-        const pct = totalCap>0?((Number(r.amount)/totalCap)*100).toFixed(1):0;
-        const isMe = currentUser && r.id===currentUser.id;
-        return `<tr${isMe?' class="me"':''}><td>${r.name}${isMe?' <span class="tag-me">أنت</span>':''}</td><td>${fmt(r.amount)} ر.س</td><td>${pct}%</td><td><span style="color:${r.status==='active'?'#4FE0AB':'#F2829A'}">${r.status==='active'?'نشط':'معطل'}</span></td></tr>`;
-      }).join('');
-      if(mTbody) mTbody.innerHTML = mHtml;
-      if(aTbody) aTbody.innerHTML = members.rows.map(r=>{
-        const pct = totalCap>0?((Number(r.amount)/totalCap)*100).toFixed(1):0;
-        return `<tr><td>${r.name}</td><td>${fmt(r.amount)}</td><td>${pct}%</td><td>${r.role==='admin'?'<span class="tag-admin">أدمن</span>':'—'}</td><td><span style="color:${r.status==='active'?'#4FE0AB':'#F2829A'}">${r.status==='active'?'نشط':'معطل'}</span></td></tr>`;
-      }).join('');
-      if(currentUser){
-        const me = members.rows.find(r=>r.id===currentUser.id);
-        if(me){
-          const pct = totalCap>0?((Number(me.amount)/totalCap)*100).toFixed(1):0;
-          safeSet('my-amount', fmt(me.amount)+' ر.س');
-          safeSet('my-pct', pct+'%');
-        }
-      }
-      const mList = document.getElementById('members-list');
-      if(mList) mList.innerHTML = members.rows.map(r=>{
-        const pct = totalCap>0?((Number(r.amount)/totalCap)*100).toFixed(1):0;
-        const isMe = currentUser && r.id===currentUser.id;
-        const isAdmin = r.role==='admin';
-        return `<div class="member-row"><span class="status-dot ${r.status==='active'?'active':'inactive'}"></span><div class="avatar-sm ${isMe?'me':''}" style="display:inline-flex">${r.name?.slice(0,1)||'؟'}</div><div class="member-info" style="margin-right:8px"><div class="member-name">${r.name} ${isMe?'<span class="tag-me">أنت</span>':''} ${isAdmin?'<span class="tag-admin">أدمن</span>':''}</div><div class="member-email">${r.email||''}</div></div><span class="member-share">${pct}%</span></div>`;
-      }).join('');
-      const profitDiv = document.getElementById('profit-distribution');
-      if(profitDiv && !summary.error){
-        profitDiv.innerHTML = '<div class="card-title" style="margin-bottom:16px">نصيب كل عضو</div>' +
-        members.rows.filter(r=>r.status==='active').map(r=>{
-          const pct = totalCap>0?((Number(r.amount)/totalCap)*100):0;
-          const share = (Number(summary.totalPnl)*pct/100);
-          const isMe = currentUser && r.id===currentUser.id;
-          return `<div class="profit-row${isMe?' highlight':''}"><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm${isMe?' me':''}" style="display:inline-flex">${r.name?.slice(0,1)||'؟'}</div><div><div style="font-size:13px;font-weight:600">${r.name}${isMe?' <span class="tag-me">أنت</span>':''}</div><div style="font-size:11px;color:#8DA2AA">حصة ${pct.toFixed(1)}%</div></div></div><span class="${share>=0?'pos':'neg'}" style="font-size:15px;font-weight:700">${share>=0?'+':''}${fmt(Math.round(share))} ر.س</span></div>`;
-        }).join('');
-      }
-    }
-    if(stocks.rows){
-      const sTbody = document.getElementById('stocks-tbody');
-      if(sTbody) sTbody.innerHTML = stocks.rows.length ? stocks.rows.map(r=>`<tr><td><strong>${r.ticker}</strong><br><span style="font-size:11px;color:#8DA2AA">${r.companyName||''}</span></td><td><span class="badge ${r.type}">${r.type==='buy'?'شراء':'بيع'}</span></td><td>${Number(r.qty).toLocaleString()}</td><td>${Number(r.price).toLocaleString()}</td><td class="${Number(r.pnl)>=0?'pos':'neg'}">${Number(r.pnl)>=0?'+':''}${Number(r.pnl).toLocaleString()} ر.س</td><td style="color:#8DA2AA">${r.date}</td></tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:#8DA2AA">لا توجد صفقات بعد</td></tr>';
-    }
-    if(options.rows){
-      const oTbody = document.getElementById('options-tbody');
-      if(oTbody) oTbody.innerHTML = options.rows.length ? options.rows.map(r=>`<tr><td><strong>${r.ticker}</strong></td><td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td><td>$${r.strike}</td><td>${r.expiry}</td><td>${r.contracts}</td><td class="${Number(r.pnl)>=0?'pos':'neg'}">${Number(r.pnl)>=0?'+':''}${Number(r.pnl).toLocaleString()} ر.س</td></tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:#8DA2AA">لا توجد عقود بعد</td></tr>';
-    }
-    showToast('✓ تم تحميل البيانات من الشيت');
-  } catch(e){ showToast('تعذّر تحميل البيانات'); }
+
+    renderAdminMembersOverview(members.rows || [], summary);
+    renderAdminOpenTrades();
+    renderProfitDistribution(members.rows || [], summary);
+    renderMembersList(members.rows || []);
+    showToast('✓ تم تحميل البيانات');
+  } catch(e) { showToast('تعذّر تحميل البيانات'); }
 }
 
-function safeSet(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+async function loadMemberData() {
+  showToast('جاري تحميل البيانات...');
+  try {
+    const [summary, stocks, options] = await Promise.all([
+      api('getSummary'), api('getStocks'), api('getOptions')
+    ]);
 
-function showSection(prefix,name,el){
-  const page=prefix==='m'?'member':'admin';
+    if (stocks.rows) allStocks = stocks.rows;
+    if (options.rows) allOptions = options.rows;
+
+    // KPIs عامة للمحفظة
+    if (!summary.error) {
+      safeSet('m-kpi-capital', fmt(summary.totalCapital));
+      safeSet('m-kpi-pnl', (summary.totalPnl>=0?'+':'')+fmt(summary.totalPnl));
+      safeSet('m-kpi-pct', summary.pnlPct+'%');
+      const openCount = allStocks.filter(r=>r.status==='open').length + allOptions.filter(r=>r.status==='open').length;
+      safeSet('m-kpi-open', openCount);
+      document.getElementById('m-last-update').textContent = 'آخر تحديث: ' + new Date().toLocaleTimeString('ar-SA');
+    }
+
+    renderMemberOpenTrades();
+    renderMyPortfolio(summary);
+    showToast('✓ تم تحميل البيانات');
+  } catch(e) { showToast('تعذّر تحميل البيانات'); }
+}
+
+// ════════════════════════════════════════
+//  Render Functions
+// ════════════════════════════════════════
+
+function renderAdminMembersOverview(rows, summary) {
+  const tbody = document.getElementById('a-members-overview');
+  if (!tbody) return;
+  const totalCap = rows.filter(r=>r.status==='active').reduce((s,r)=>s+Number(r.amount),0);
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#8DA2AA;padding:20px">لا يوجد أعضاء</td></tr>'; return; }
+
+  tbody.innerHTML = rows.map(r => {
+    const pct = totalCap > 0 ? ((Number(r.amount)/totalCap)*100) : 0;
+    const memberProfit = calcMemberProfit(r, summary);
+    const isMe = currentUser && r.id === currentUser.id;
+    return `<tr>
+      <td><div class="avatar-sm ${isMe?'me':''}" style="display:inline-flex">${r.name?.slice(0,1)||'؟'}</div>${r.name} ${isMe?'<span class="tag-me">أنت</span>':''} ${r.role==='admin'?'<span class="tag-admin">أدمن</span>':''}</td>
+      <td style="color:#8DA2AA;font-size:12px">${r.email||'—'}</td>
+      <td>${fmt(r.amount)} ر.س</td>
+      <td>${pct.toFixed(1)}%</td>
+      <td class="${memberProfit>=0?'pos':'neg'}">${memberProfit>=0?'+':''}${fmt(Math.round(memberProfit))} ر.س</td>
+      <td><span style="color:${r.status==='active'?'#4FE0AB':'#F2829A'};font-size:12px">${r.status==='active'?'● نشط':'● معطل'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAdminOpenTrades() {
+  // Preview في الصفحة الرئيسية
+  const preview = document.getElementById('a-open-preview');
+  const openStocks = allStocks.filter(r=>r.status==='open');
+  const openOptions = allOptions.filter(r=>r.status==='open');
+  const allOpen = [
+    ...openStocks.map(r=>({...r, _type:'stock'})),
+    ...openOptions.map(r=>({...r, _type:'option'}))
+  ].slice(0,5);
+
+  if (preview) {
+    preview.innerHTML = allOpen.length ? allOpen.map(r => `
+      <tr>
+        <td><strong>${r.ticker}</strong></td>
+        <td><span class="badge ${r._type==='stock'?r.type:r.type}">${r._type==='stock'?(r.type==='buy'?'شراء':'بيع'):r.type.toUpperCase()}</span></td>
+        <td style="font-size:12px;color:#8DA2AA">${r._type==='stock'?`${fmt(r.qty)} × ${r.price} ر.س`:`Strike $${r.strike} · ${r.contracts} عقود`}</td>
+        <td style="color:#8DA2AA">${r.date}</td>
+        <td><button class="btn-close-trade" onclick="openCloseModal('${r.id}','${r._type}')">إغلاق</button></td>
+      </tr>`) .join('') : '<tr><td colspan="5" style="text-align:center;color:#8DA2AA;padding:20px">لا توجد صفقات مفتوحة</td></tr>';
+  }
+
+  // صفحة الصفقات المفتوحة الكاملة
+  const sBody = document.getElementById('a-stocks-open');
+  if (sBody) {
+    sBody.innerHTML = openStocks.length ? openStocks.map(r=>`
+      <tr>
+        <td><strong>${r.ticker}</strong><br><span style="font-size:11px;color:#8DA2AA">${r.companyName||''}</span></td>
+        <td><span class="badge ${r.type}">${r.type==='buy'?'شراء':'بيع'}</span></td>
+        <td>${fmt(r.qty)}</td>
+        <td>${r.price} ر.س</td>
+        <td style="color:#8DA2AA">${r.date}</td>
+        <td><button class="btn-close-trade" onclick="openCloseModal('${r.id}','stock')">إغلاق</button></td>
+      </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:#8DA2AA;padding:20px">لا توجد أسهم مفتوحة</td></tr>';
+  }
+
+  const oBody = document.getElementById('a-options-open');
+  if (oBody) {
+    oBody.innerHTML = openOptions.length ? openOptions.map(r=>`
+      <tr>
+        <td><strong>${r.ticker}</strong></td>
+        <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
+        <td>$${r.strike}</td>
+        <td style="color:${new Date(r.expiry)<new Date()?'#F2829A':'#8DA2AA'}">${r.expiry}</td>
+        <td>${r.contracts}</td>
+        <td><button class="btn-close-trade" onclick="openCloseModal('${r.id}','option')">إغلاق</button></td>
+      </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:#8DA2AA;padding:20px">لا توجد عقود مفتوحة</td></tr>';
+  }
+}
+
+function renderMemberOpenTrades() {
+  const openStocks = allStocks.filter(r=>r.status==='open');
+  const openOptions = allOptions.filter(r=>r.status==='open');
+
+  // Preview
+  const preview = document.getElementById('m-open-trades-preview');
+  const allOpen = [...openStocks.map(r=>({...r,_t:'stock'})),...openOptions.map(r=>({...r,_t:'option'}))].slice(0,4);
+  if (preview) {
+    preview.innerHTML = allOpen.length ? allOpen.map(r=>`
+      <tr>
+        <td><strong>${r.ticker}</strong></td>
+        <td><span class="badge ${r._t==='stock'?r.type:r.type}">${r._t==='stock'?(r.type==='buy'?'شراء':'بيع'):r.type.toUpperCase()}</span></td>
+        <td style="font-size:12px;color:#8DA2AA">${r._t==='stock'?`${fmt(r.qty)} سهم`:` Strike $${r.strike}`}</td>
+        <td style="color:#8DA2AA">${r.date}</td>
+      </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:#8DA2AA;padding:20px">لا توجد صفقات مفتوحة حالياً</td></tr>';
+  }
+
+  // أسهم
+  const sBody = document.getElementById('m-stocks-open');
+  if (sBody) {
+    sBody.innerHTML = openStocks.length ? openStocks.map(r=>`
+      <tr>
+        <td><strong>${r.ticker}</strong><br><span style="font-size:11px;color:#8DA2AA">${r.companyName||''}</span></td>
+        <td><span class="badge ${r.type}">${r.type==='buy'?'شراء':'بيع'}</span></td>
+        <td>${fmt(r.qty)}</td>
+        <td>${r.price} ر.س</td>
+        <td style="color:#8DA2AA">${r.date}</td>
+      </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#8DA2AA;padding:20px">لا توجد أسهم مفتوحة</td></tr>';
+  }
+
+  // أوبشن
+  const oBody = document.getElementById('m-options-open');
+  if (oBody) {
+    oBody.innerHTML = openOptions.length ? openOptions.map(r=>`
+      <tr>
+        <td><strong>${r.ticker}</strong></td>
+        <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
+        <td>$${r.strike}</td>
+        <td style="color:${new Date(r.expiry)<new Date()?'#F2829A':'#8DA2AA'}">${r.expiry}</td>
+        <td>${r.contracts}</td>
+      </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#8DA2AA;padding:20px">لا توجد عقود مفتوحة</td></tr>';
+  }
+}
+
+function renderMyPortfolio(summary) {
+  if (!currentUser) return;
+  const me = allMembers.find(r=>r.id===currentUser.id) || currentUser;
+  const totalCap = allMembers.filter(r=>r.status==='active').reduce((s,r)=>s+Number(r.amount),0) || Number(summary?.totalCapital||0);
+  const myPct = totalCap > 0 ? (Number(me.amount||currentUser.amount)/totalCap)*100 : 0;
+  const myProfit = calcMemberProfit(me, summary);
+  const myReturnPct = Number(me.amount||currentUser.amount) > 0 ? (myProfit / Number(me.amount||currentUser.amount) * 100).toFixed(1) : 0;
+
+  safeSet('my-amount', fmt(me.amount||currentUser.amount||0));
+  safeSet('my-profit', (myProfit>=0?'+':'')+fmt(Math.round(myProfit)));
+  safeSet('my-share-pct', myPct.toFixed(1)+'%');
+  safeSet('my-return-pct', (myReturnPct>=0?'+':'')+myReturnPct+'%');
+  if (me.joinDate||currentUser.joinDate) safeSet('my-join-date', 'انضم: '+(me.joinDate||currentUser.joinDate));
+  safeSet('my-open-count', allStocks.filter(r=>r.status==='open').length + allOptions.filter(r=>r.status==='open').length);
+  safeSet('my-closed-count', allStocks.filter(r=>r.status==='closed').length + allOptions.filter(r=>r.status==='closed').length);
+  document.getElementById('my-profit').style.color = myProfit >= 0 ? '#4FE0AB' : '#F2829A';
+}
+
+function renderProfitDistribution(rows, summary) {
+  const div = document.getElementById('profit-distribution');
+  if (!div || !summary || summary.error) return;
+  const totalCap = rows.filter(r=>r.status==='active').reduce((s,r)=>s+Number(r.amount),0);
+
+  div.innerHTML = '<div class="card-title" style="margin-bottom:16px">نصيب كل عضو من الأرباح المحققة</div>' +
+    '<div style="font-size:12px;color:#8DA2AA;margin-bottom:16px">محسوب من تاريخ انضمام كل عضو</div>' +
+    rows.filter(r=>r.status==='active').map(r => {
+      const profit = calcMemberProfit(r, summary);
+      const pct = totalCap > 0 ? ((Number(r.amount)/totalCap)*100) : 0;
+      const isMe = currentUser && r.id === currentUser.id;
+      return `<div class="profit-row${isMe?' highlight':''}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar-sm${isMe?' me':''}" style="display:inline-flex">${r.name?.slice(0,1)||'؟'}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600">${r.name} ${isMe?'<span class="tag-me">أنت</span>':''}</div>
+            <div style="font-size:11px;color:#8DA2AA">حصة ${pct.toFixed(1)}% · انضم ${r.joinDate||'—'}</div>
+          </div>
+        </div>
+        <span class="${profit>=0?'pos':'neg'}" style="font-size:15px;font-weight:700">${profit>=0?'+':''}${fmt(Math.round(profit))} ر.س</span>
+      </div>`;
+    }).join('');
+}
+
+function renderMembersList(rows) {
+  const list = document.getElementById('members-list');
+  if (!list) return;
+  const totalCap = rows.filter(r=>r.status==='active').reduce((s,r)=>s+Number(r.amount),0);
+
+  list.innerHTML = rows.map(r => {
+    const pct = totalCap > 0 ? ((Number(r.amount)/totalCap)*100).toFixed(1) : 0;
+    const isMe = currentUser && r.id === currentUser.id;
+    const isAdmin = r.role === 'admin';
+    return `<div class="member-row">
+      <span class="status-dot ${r.status==='active'?'active':'inactive'}"></span>
+      <div class="avatar-sm ${isMe?'me':''}" style="display:inline-flex">${r.name?.slice(0,1)||'؟'}</div>
+      <div class="member-info" style="margin-right:8px">
+        <div class="member-name">${r.name} ${isMe?'<span class="tag-me">أنت</span>':''} ${isAdmin?'<span class="tag-admin">أدمن</span>':''}</div>
+        <div class="member-email">${r.email||''} · انضم ${r.joinDate||'—'}</div>
+      </div>
+      <span class="member-share">${pct}%</span>
+      <div style="display:flex;gap:6px;margin-right:8px">
+        <button class="btn-amber" onclick="openChangePinModal('${r.id}','${r.name}')" style="padding:5px 10px;font-size:11px">🔑 رمز</button>
+        ${!isMe ? `<button class="${r.status==='active'?'btn-danger':'btn-amber'}" onclick="toggleMemberStatus('${r.id}','${r.status==='active'?'inactive':'active'}')" style="padding:5px 10px;font-size:11px">${r.status==='active'?'تعطيل':'تفعيل'}</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+//  حساب أرباح العضو من تاريخ انضمامه
+// ════════════════════════════════════════
+function calcMemberProfit(member, summary) {
+  if (!member || !summary || summary.error) return 0;
+  const joinDate = new Date(member.joinDate || '2000-01-01');
+  const totalCap = allMembers.filter(r=>r.status==='active').reduce((s,r)=>s+Number(r.amount),0);
+  const memberPct = totalCap > 0 ? Number(member.amount) / totalCap : 0;
+
+  // أرباح الأسهم المغلقة بعد انضمامه
+  const stockProfit = allStocks
+    .filter(r => r.status === 'closed' && new Date(r.closeDate||r.date) >= joinDate)
+    .reduce((s,r) => s + Number(r.pnl||0), 0);
+
+  // أرباح الأوبشن المغلقة بعد انضمامه
+  const optionProfit = allOptions
+    .filter(r => r.status === 'closed' && new Date(r.closeDate||r.date) >= joinDate)
+    .reduce((s,r) => s + Number(r.pnl||0), 0);
+
+  return (stockProfit + optionProfit) * memberPct;
+}
+
+// ════════════════════════════════════════
+//  إغلاق الصفقات
+// ════════════════════════════════════════
+function openCloseModal(id, type) {
+  if (type === 'stock') {
+    const trade = allStocks.find(r=>r.id===id);
+    if (!trade) return;
+    closingStockId = id;
+    document.getElementById('modal-stock-info').textContent = `${trade.ticker} · ${fmt(trade.qty)} سهم · دخول ${trade.price} ر.س`;
+    document.getElementById('close-stock-price').value = '';
+    document.getElementById('close-stock-calc').textContent = 'أدخل سعر البيع لحساب الربح/الخسارة';
+    document.getElementById('modal-close-stock').classList.add('show');
+    document.getElementById('close-stock-price').oninput = () => calcCloseStock(trade);
+  } else {
+    const trade = allOptions.find(r=>r.id===id);
+    if (!trade) return;
+    closingOptionId = id;
+    document.getElementById('modal-option-info').textContent = `${trade.ticker} ${trade.type.toUpperCase()} Strike $${trade.strike} · ${trade.contracts} عقود · دخول $${trade.premium}`;
+    document.getElementById('close-option-price').value = '';
+    document.getElementById('close-option-calc').textContent = 'أدخل سعر الإغلاق لحساب الربح/الخسارة';
+    document.getElementById('modal-close-option').classList.add('show');
+    document.getElementById('close-option-price').oninput = () => calcCloseOption(trade);
+    document.getElementById('close-option-reason').onchange = () => {
+      if (document.getElementById('close-option-reason').value === 'expired') {
+        document.getElementById('close-option-price').value = '0';
+        calcCloseOption(trade);
+      }
+    };
+  }
+}
+
+function calcCloseStock(trade) {
+  const sellPrice = parseFloat(document.getElementById('close-stock-price').value) || 0;
+  const pnl = (sellPrice - Number(trade.price)) * Number(trade.qty);
+  const pnlEl = document.getElementById('close-stock-calc');
+  pnlEl.innerHTML = `الربح/الخسارة: <span class="${pnl>=0?'pos':'neg'}" style="font-weight:700">${pnl>=0?'+':''}${fmt(Math.round(pnl))} ر.س</span>`;
+}
+
+function calcCloseOption(trade) {
+  const closePrice = parseFloat(document.getElementById('close-option-price').value) || 0;
+  const pnl = (closePrice - Number(trade.premium)) * Number(trade.contracts) * 100;
+  const pnlEl = document.getElementById('close-option-calc');
+  pnlEl.innerHTML = `الربح/الخسارة: <span class="${pnl>=0?'pos':'neg'}" style="font-weight:700">${pnl>=0?'+':''}$${Math.round(pnl).toLocaleString()}</span>`;
+}
+
+async function confirmCloseStock() {
+  const trade = allStocks.find(r=>r.id===closingStockId);
+  const sellPrice = parseFloat(document.getElementById('close-stock-price').value);
+  if (!sellPrice || sellPrice <= 0) { showToast('أدخل سعر البيع'); return; }
+  const pnl = (sellPrice - Number(trade.price)) * Number(trade.qty);
+  showToast('جاري الإغلاق...');
+  const r = await apiPost({action:'closeTrade', tradeId:closingStockId, tradeType:'stock', closePrice:sellPrice, pnl:Math.round(pnl), closeDate:new Date().toISOString().split('T')[0]});
+  if (r.error) { showToast('خطأ: '+r.error); return; }
+  closeModal('modal-close-stock');
+  showToast(`✓ تم إغلاق ${trade.ticker} · ${pnl>=0?'ربح':'خسارة'} ${fmt(Math.abs(Math.round(pnl)))} ر.س`);
+  await loadAdminData();
+}
+
+async function confirmCloseOption() {
+  const trade = allOptions.find(r=>r.id===closingOptionId);
+  const reason = document.getElementById('close-option-reason').value;
+  const closePrice = reason === 'expired' ? 0 : parseFloat(document.getElementById('close-option-price').value) || 0;
+  const pnl = (closePrice - Number(trade.premium)) * Number(trade.contracts) * 100;
+  showToast('جاري الإغلاق...');
+  const r = await apiPost({action:'closeTrade', tradeId:closingOptionId, tradeType:'option', closePrice, pnl:Math.round(pnl), closeDate:new Date().toISOString().split('T')[0], reason});
+  if (r.error) { showToast('خطأ: '+r.error); return; }
+  closeModal('modal-close-option');
+  showToast(`✓ تم إغلاق ${trade.ticker} ${trade.type.toUpperCase()} · ${pnl>=0?'ربح':'خسارة'} $${Math.abs(Math.round(pnl)).toLocaleString()}`);
+  await loadAdminData();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ════════════════════════════════════════
+//  إدارة الأعضاء
+// ════════════════════════════════════════
+function toggleAddMember() {
+  const c = document.getElementById('add-member-card');
+  c.style.display = c.style.display === 'none' || !c.style.display ? 'block' : 'none';
+  document.getElementById('new-date').value = new Date().toISOString().split('T')[0];
+}
+
+async function addMember() {
+  const name = document.getElementById('new-name').value.trim();
+  const email = document.getElementById('new-email').value.trim().toLowerCase();
+  const pinVal = document.getElementById('new-pin').value.trim();
+  const amount = document.getElementById('new-amount').value.trim();
+  const role = document.getElementById('new-role').value;
+  const date = document.getElementById('new-date').value;
+  if (!name || !email || !pinVal || pinVal.length !== 6) { showToast('أكمل البيانات: الاسم، الإيميل، الرمز السري'); return; }
+  showToast('جاري الإضافة...');
+  const r = await apiPost({action:'addMember', data:{name, email, pin:pinVal, amount:Number(amount)||0, role, joinDate:date}});
+  if (r.error) { showToast('خطأ: '+r.error); return; }
+  showToast(`✓ تم إضافة ${name}`);
+  toggleAddMember();
+  ['new-name','new-email','new-pin','new-amount'].forEach(id=>document.getElementById(id).value='');
+  await loadAdminData();
+}
+
+async function toggleMemberStatus(memberId, newStatus) {
+  const r = await apiPost({action:'toggleStatus', memberId, status:newStatus});
+  if (r.error) { showToast('خطأ: '+r.error); return; }
+  showToast(newStatus === 'active' ? '✓ تم تفعيل العضو' : '✓ تم تعطيل العضو');
+  await loadAdminData();
+}
+
+function openChangePinModal(memberId, memberName) {
+  changingPinId = memberId;
+  document.getElementById('modal-pin-member-name').textContent = 'تغيير رمز: ' + memberName;
+  document.getElementById('new-pin-value').value = '';
+  document.getElementById('modal-change-pin').classList.add('show');
+}
+
+async function confirmChangePin() {
+  const newPin = document.getElementById('new-pin-value').value.trim();
+  if (!newPin || newPin.length !== 6 || !/^\d{6}$/.test(newPin)) { showToast('الرمز يجب أن يكون 6 أرقام'); return; }
+  const r = await apiPost({action:'changePin', memberId:changingPinId, newPin});
+  if (r.error) { showToast('خطأ: '+r.error); return; }
+  closeModal('modal-change-pin');
+  showToast('✓ تم تغيير الرمز السري');
+  await loadAdminData();
+}
+
+// ════════════════════════════════════════
+//  تسجيل الصفقات
+// ════════════════════════════════════════
+async function saveStockTrade() {
+  const ticker = document.getElementById('ts-ticker').value.trim();
+  const name = document.getElementById('ts-name').value.trim();
+  const type = document.getElementById('ts-type').value;
+  const qty = document.getElementById('ts-qty').value.trim();
+  const price = document.getElementById('ts-price').value.trim();
+  const date = document.getElementById('ts-date').value;
+  if (!ticker || !qty || !price) { showToast('أكمل بيانات الصفقة'); return; }
+  showToast('جاري التسجيل...');
+  const r = await apiPost({action:'addStock', data:{ticker, name, type, qty:Number(qty), price:Number(price), date, status:'open'}});
+  if (r.error) { showToast('خطأ: '+r.error); return; }
+  showToast(`✓ تم تسجيل ${type==='buy'?'شراء':'بيع'} ${ticker}`);
+  ['ts-ticker','ts-name','ts-qty','ts-price','ts-date'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('stock-preview').textContent='أدخل بيانات الصفقة لرؤية الملخص';
+  await loadAdminData();
+}
+
+async function saveOptionTrade() {
+  const ticker = document.getElementById('to-ticker').value.trim();
+  const type = document.getElementById('to-type').value;
+  const strike = document.getElementById('to-strike').value.trim();
+  const expiry = document.getElementById('to-expiry').value;
+  const contracts = document.getElementById('to-qty').value.trim();
+  const premium = document.getElementById('to-premium').value.trim();
+  if (!ticker || !strike || !contracts) { showToast('أكمل بيانات العقد'); return; }
+  showToast('جاري التسجيل...');
+  const r = await apiPost({action:'addOption', data:{ticker, type, strike:Number(strike), expiry, contracts:Number(contracts), premium:Number(premium), status:'open'}});
+  if (r.error) { showToast('خطأ: '+r.error); return; }
+  showToast(`✓ تم تسجيل ${type.toUpperCase()} ${ticker}`);
+  ['to-ticker','to-strike','to-qty','to-premium','to-expiry'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('option-preview').textContent='أدخل بيانات العقد لرؤية الملخص';
+  await loadAdminData();
+}
+
+// Preview live
+document.addEventListener('input', e => {
+  if (['ts-qty','ts-price','ts-ticker'].includes(e.target.id)) {
+    const q=parseFloat(document.getElementById('ts-qty')?.value)||0;
+    const p=parseFloat(document.getElementById('ts-price')?.value)||0;
+    const t=document.getElementById('ts-ticker')?.value||'—';
+    const prev=document.getElementById('stock-preview');
+    if(prev&&q&&p) prev.innerHTML=`${t} · ${fmt(q)} سهم × ${p} ر.س = <span style="color:#4FE0AB;font-weight:700">${fmt(Math.round(q*p))} ر.س</span>`;
+  }
+  if (['to-qty','to-premium','to-ticker'].includes(e.target.id)) {
+    const q=parseFloat(document.getElementById('to-qty')?.value)||0;
+    const pr=parseFloat(document.getElementById('to-premium')?.value)||0;
+    const t=document.getElementById('to-ticker')?.value||'—';
+    const prev=document.getElementById('option-preview');
+    if(prev&&q&&pr) prev.innerHTML=`${t} · ${q} عقود × $${pr} × 100 = <span style="color:#EF9F27;font-weight:700">$${fmt(Math.round(q*pr*100))}</span>`;
+  }
+});
+
+// ════════════════════════════════════════
+//  Navigation
+// ════════════════════════════════════════
+function showSection(prefix, name, el) {
+  const page = prefix==='m'?'member':'admin';
   document.querySelectorAll(`#page-${page} .section`).forEach(s=>s.classList.remove('active'));
   document.getElementById(`${prefix}-section-${name}`).classList.add('active');
   document.querySelectorAll(`#page-${page} .sb-item`).forEach(i=>i.classList.remove('active'));
-  if(el) el.classList.add('active');
+  if (el) el.classList.add('active');
 }
-function showInner(prefix,name,el){
-  const parent=document.getElementById(`${prefix}-${name}`).parentElement;
+function showInner(prefix, name, el) {
+  const parent = document.getElementById(`${prefix}-${name}`).parentElement;
   parent.querySelectorAll('.inner-section').forEach(s=>s.classList.remove('active'));
   document.getElementById(`${prefix}-${name}`).classList.add('active');
   el.closest('.inner-tabs').querySelectorAll('.inner-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
 }
 
-function showAddMember(){ const c=document.getElementById('add-member-card'); c.style.display=c.style.display==='none'||!c.style.display?'block':'none'; document.getElementById('new-date').value=new Date().toISOString().split('T')[0]; }
-function hideAddMember(){ document.getElementById('add-member-card').style.display='none'; }
-
-async function addMember(){
-  const name=document.getElementById('new-name').value.trim();
-  const email=document.getElementById('new-email').value.trim();
-  const pinVal=document.getElementById('new-pin').value.trim();
-  const amount=document.getElementById('new-amount').value.trim();
-  const role=document.getElementById('new-role').value;
-  const date=document.getElementById('new-date').value;
-  if(!name||!pinVal||pinVal.length!==6){showToast('أدخل الاسم والرمز السري (6 أرقام)');return;}
-  showToast('جاري الإضافة...');
-  const r = await apiPost({action:'addMember', data:{name,email,pin:pinVal,amount:Number(amount),role,joinDate:date}});
-  if(r.error){showToast('خطأ: '+r.error);return;}
-  showToast(`✓ تم إضافة ${name}`);
-  hideAddMember();
-  ['new-name','new-email','new-pin','new-amount'].forEach(id=>document.getElementById(id).value='');
-  await loadDashboardData('admin');
+// ════════════════════════════════════════
+//  Helpers
+// ════════════════════════════════════════
+function safeSet(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.add('show'); clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),3000);
 }
-
-async function saveStockTrade(){
-  const ticker=document.getElementById('ts-ticker').value.trim();
-  const name=document.getElementById('ts-name').value.trim();
-  const type=document.getElementById('ts-type').value;
-  const qty=document.getElementById('ts-qty').value.trim();
-  const price=document.getElementById('ts-price').value.trim();
-  const date=document.getElementById('ts-date').value;
-  if(!ticker||!qty||!price){showToast('أكمل بيانات الصفقة');return;}
-  showToast('جاري التسجيل...');
-  const r = await apiPost({action:'addStock', data:{ticker,name,type,qty:Number(qty),price:Number(price),date}});
-  if(r.error){showToast('خطأ: '+r.error);return;}
-  showToast(`✓ تم تسجيل صفقة ${type==='buy'?'شراء':'بيع'} ${ticker} في الشيت`);
-  ['ts-ticker','ts-name','ts-qty','ts-price'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('stock-preview').textContent='أدخل بيانات الصفقة لرؤية الملخص';
-}
-
-async function saveOptionTrade(){
-  const ticker=document.getElementById('to-ticker').value.trim();
-  const type=document.getElementById('to-type').value;
-  const strike=document.getElementById('to-strike').value.trim();
-  const expiry=document.getElementById('to-expiry').value;
-  const contracts=document.getElementById('to-qty').value.trim();
-  const premium=document.getElementById('to-premium').value.trim();
-  if(!ticker||!strike||!contracts){showToast('أكمل بيانات العقد');return;}
-  showToast('جاري التسجيل...');
-  const r = await apiPost({action:'addOption', data:{ticker,type,strike:Number(strike),expiry,contracts:Number(contracts),premium:Number(premium)}});
-  if(r.error){showToast('خطأ: '+r.error);return;}
-  showToast(`✓ تم تسجيل عقد ${type.toUpperCase()} على ${ticker} في الشيت`);
-  ['to-ticker','to-strike','to-qty','to-premium'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('option-preview').textContent='أدخل بيانات العقد لرؤية الملخص';
-}
-
-document.addEventListener('input',e=>{
-  if(['ts-qty','ts-price','ts-ticker'].includes(e.target.id)){
-    const q=parseFloat(document.getElementById('ts-qty')?.value)||0;
-    const p=parseFloat(document.getElementById('ts-price')?.value)||0;
-    const t=document.getElementById('ts-ticker')?.value||'—';
-    const prev=document.getElementById('stock-preview');
-    if(prev&&q&&p) prev.innerHTML=`<span style="color:#EAF3F4">${t}</span> · ${q.toLocaleString()} سهم × ${p} ر.س = <span style="color:#4FE0AB;font-weight:700">${(q*p).toLocaleString()} ر.س</span>`;
-  }
-  if(['to-qty','to-premium','to-ticker','to-type'].includes(e.target.id)){
-    const q=parseFloat(document.getElementById('to-qty')?.value)||0;
-    const pr=parseFloat(document.getElementById('to-premium')?.value)||0;
-    const t=document.getElementById('to-ticker')?.value||'—';
-    const type=document.getElementById('to-type')?.value||'call';
-    const prev=document.getElementById('option-preview');
-    if(prev&&q&&pr) prev.innerHTML=`<span style="color:#EAF3F4">${t}</span> · ${type.toUpperCase()} · ${q} عقود × $${pr} × 100 = <span style="color:#EF9F27;font-weight:700">$${(q*pr*100).toLocaleString()}</span>`;
-  }
-});
-
-function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.remove('show'),3000); }
 </script>
 </body>
 </html>
