@@ -169,7 +169,33 @@ tbody td{padding:13px 8px;color:#C3D2D7}
 .chart-empty{display:flex;align-items:center;justify-content:center;height:220px;color:#8DA2AA;font-size:13px;flex-direction:column;gap:8px}
 
 @media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr}.personal-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.sidebar{width:220px}.content{padding:16px 16px 50px}.topbar{padding:16px}}
+@media(max-width:768px){
+  #page-member.active,#page-admin.active{flex-direction:column}
+  .sidebar{width:100%;height:auto;flex-direction:row;padding:8px 12px;border-left:none;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:100;overflow-x:auto;overflow-y:hidden}
+  .sb-logo{display:none}
+  .sb-nav{flex-direction:row;gap:0;flex:1}
+  .sb-item{flex-direction:column;gap:2px;padding:8px 10px;font-size:11px;text-align:center;min-width:60px}
+  .sb-dot{display:none}
+  .sb-divider{display:none}
+  .sb-back{font-size:11px;padding:8px 10px;flex-direction:column;gap:2px;text-align:center;min-width:60px}
+  .sb-user{display:none}
+  .sb-preview-badge{display:none}
+  .main{min-height:0}
+  .topbar{padding:14px 16px}
+  .topbar-title{font-size:18px}
+  .content{padding:14px 14px 80px}
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{padding:14px}
+  .kpi-val{font-size:20px}
+  .personal-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .login-card{padding:28px 20px}
+  .pin-key{padding:13px 6px;font-size:20px}
+  .modal{margin:10px;padding:20px}
+  table{font-size:12px}
+  thead td{padding:10px 6px}
+  tbody td{padding:10px 6px}
+}
 </style>
 </head>
 <body>
@@ -187,7 +213,7 @@ tbody td{padding:13px 8px;color:#C3D2D7}
       <div class="login-title">مرحباً بك</div>
       <div class="login-sub">أدخل بريدك الإلكتروني للمتابعة</div>
       <div class="email-input-wrap">
-        <input type="email" id="email-input" placeholder="example@email.com" autocomplete="email">
+        <input type="email" id="email-input" placeholder="example@email.com" autocomplete="email" inputmode="email" enterkeyhint="go">
       </div>
       <button class="btn-primary" onclick="submitEmail()">متابعة</button>
       <div class="login-hint" id="email-hint" style="margin-top:12px"></div>
