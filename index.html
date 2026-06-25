@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>المحفظة المشتركة</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -162,6 +163,11 @@ tbody td{padding:13px 8px;color:#C3D2D7}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#0E1D24;border:1px solid rgba(79,224,171,.3);border-radius:12px;padding:12px 20px;font-size:13px;color:#EAF3F4;transition:transform .3s ease;z-index:1001;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
+
+/* CHART */
+.chart-wrap{position:relative;height:220px;margin-top:16px}
+.chart-empty{display:flex;align-items:center;justify-content:center;height:220px;color:#8DA2AA;font-size:13px;flex-direction:column;gap:8px}
+
 @media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr}.personal-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
 @media(max-width:640px){.sidebar{width:220px}.content{padding:16px 16px 50px}.topbar{padding:16px}}
 </style>
@@ -208,6 +214,11 @@ tbody td{padding:13px 8px;color:#C3D2D7}
       <div class="login-hint" id="pin-hint">أدخل رمزك للدخول</div>
       <button class="btn-link" onclick="backToEmail()">← تغيير البريد الإلكتروني</button>
     </div>
+
+    <div class="login-demo" style="margin-top:16px">
+      <div style="color:#6E848C;font-size:12px;margin-bottom:8px">لست عضواً بعد؟</div>
+      <button class="btn-primary" style="background:transparent;border:1px solid rgba(255,255,255,.15);color:#C3D2D7;font-weight:500" onclick="showJoinForm()">طلب الانضمام للمحفظة</button>
+    </div>
   </div>
 </div>
 
@@ -239,6 +250,15 @@ tbody td{padding:13px 8px;color:#C3D2D7}
           <div class="kpi"><div class="kpi-label">العائد الكلي %</div><div class="kpi-val" id="m-kpi-pct" style="color:#4FE0AB">—</div></div>
           <div class="kpi highlight"><div class="kpi-label">الصفقات المفتوحة</div><div class="kpi-val" id="m-kpi-open">—</div></div>
         </div>
+        
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div class="card-title">أداء المحفظة</div>
+            <span style="font-size:11px;color:#8DA2AA">الأرباح التراكمية من الصفقات المغلقة</span>
+          </div>
+          <div class="chart-wrap"><canvas id="m-perf-chart"></canvas><div class="chart-empty" id="m-chart-empty" style="display:none"><span style="font-size:24px">📊</span>لا توجد صفقات مغلقة بعد</div></div>
+        </div>
+
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
             <div class="card-title">آخر الصفقات المفتوحة</div>
@@ -307,6 +327,7 @@ tbody td{padding:13px 8px;color:#C3D2D7}
       <div class="sb-item" onclick="showSection('a','trades',this)"><span class="sb-dot"></span>إدخال الصفقات</div>
       <div class="sb-item" onclick="showSection('a','open',this)"><span class="sb-dot"></span>الصفقات المفتوحة</div>
       <div class="sb-item" onclick="showSection('a','profits',this)"><span class="sb-dot"></span>توزيع الأرباح</div>
+      <div class="sb-item" id="sb-requests" onclick="showSection('a','requests',this)"><span class="sb-dot"></span>طلبات الانضمام <span id="requests-badge" style="display:none;background:rgba(242,130,154,.2);color:#F2829A;font-size:10px;padding:2px 6px;border-radius:99px;margin-right:auto">0</span></div>
     </div>
     <div class="sb-divider"></div>
     <div class="sb-back" onclick="previewMember()">👁 معاينة واجهة المشترك</div>
@@ -332,6 +353,15 @@ tbody td{padding:13px 8px;color:#C3D2D7}
           <div class="kpi"><div class="kpi-label">الأعضاء النشطين</div><div class="kpi-val" id="a-kpi-members">—</div></div>
           <div class="kpi"><div class="kpi-label">الصفقات المفتوحة</div><div class="kpi-val" id="a-kpi-open">—</div></div>
         </div>
+        
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div class="card-title">أداء المحفظة</div>
+            <span style="font-size:11px;color:#8DA2AA">الأرباح التراكمية من الصفقات المغلقة</span>
+          </div>
+          <div class="chart-wrap"><canvas id="a-perf-chart"></canvas><div class="chart-empty" id="a-chart-empty" style="display:none"><span style="font-size:24px">📊</span>لا توجد صفقات مغلقة بعد</div></div>
+        </div>
+
         <div class="card" style="margin-bottom:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
             <div class="card-title">المشتركون وحصصهم</div>
@@ -462,6 +492,17 @@ tbody td{padding:13px 8px;color:#C3D2D7}
       </div>
     </div>
 
+
+    <!-- طلبات الانضمام -->
+    <div id="a-section-requests" class="section">
+      <div class="topbar"><div><div class="topbar-title">طلبات الانضمام</div><div class="topbar-sub">راجع الطلبات وقبل أو ارفض</div></div></div>
+      <div class="content">
+        <div class="card" id="requests-list">
+          <div style="color:#8DA2AA;text-align:center;padding:20px">جاري التحميل...</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -527,10 +568,42 @@ tbody td{padding:13px 8px;color:#C3D2D7}
   </div>
 </div>
 
+
+<!-- Modal طلب الانضمام -->
+<div class="modal-overlay" id="modal-join">
+  <div class="modal">
+    <div class="modal-title">طلب الانضمام للمحفظة</div>
+    <div class="modal-sub">سيتم مراجعة طلبك من قبل الأدمن والتواصل معك</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="form-field">
+        <label>الاسم الكامل *</label>
+        <input type="text" id="join-name" placeholder="أحمد محمد">
+      </div>
+      <div class="form-field">
+        <label>البريد الإلكتروني *</label>
+        <input type="email" id="join-email" placeholder="ahmed@gmail.com">
+      </div>
+      <div class="form-field">
+        <label>رقم الجوال (اختياري)</label>
+        <input type="tel" id="join-phone" placeholder="05xxxxxxxx">
+      </div>
+      <div class="form-field">
+        <label>رسالة للأدمن (اختياري)</label>
+        <input type="text" id="join-message" placeholder="مثال: صديق أحمد العتيبي">
+      </div>
+    </div>
+    <div id="join-hint" style="font-size:12px;color:#8DA2AA;margin-top:12px;text-align:center"></div>
+    <div class="modal-actions">
+      <button class="btn-action" onclick="submitJoinRequest()">إرسال الطلب</button>
+      <button class="btn-ghost" onclick="closeModal('modal-join')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw61UbgFGJM9zqzBxFvSa5v7PaAOUiUtn-FCp1hl9xp3oIfu_r6XY4_iBmVtLF2PE96MA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFTM7y2nAhpiJAlQERTda9HSQzszeYzq0quk23rIcXINPJzM1v8HWy_R4cFPDYGcZgsQ/exec';
 
 // ── API ──
 async function api(action, params={}) {
@@ -722,6 +795,8 @@ async function loadAdminData() {
     renderAdminOpenTrades();
     renderProfitDistribution(members.rows || [], summary);
     renderMembersList(members.rows || []);
+    setTimeout(() => renderChart('a-perf-chart', 'a-chart-empty'), 100);
+    loadJoinRequests();
     showToast('✓ تم تحميل البيانات');
   } catch(e) { showToast('تعذّر تحميل البيانات'); }
 }
@@ -748,6 +823,7 @@ async function loadMemberData() {
 
     renderMemberOpenTrades();
     renderMyPortfolio(summary);
+    setTimeout(() => renderChart('m-perf-chart', 'm-chart-empty'), 100);
     showToast('✓ تم تحميل البيانات');
   } catch(e) { showToast('تعذّر تحميل البيانات'); }
 }
@@ -1158,6 +1234,211 @@ function showInner(prefix, name, el) {
 // ════════════════════════════════════════
 //  Helpers
 // ════════════════════════════════════════
+
+
+// ════════════════════════════════════════
+//  طلبات الانضمام
+// ════════════════════════════════════════
+function showJoinForm() {
+  document.getElementById('join-name').value = '';
+  document.getElementById('join-email').value = '';
+  document.getElementById('join-phone').value = '';
+  document.getElementById('join-message').value = '';
+  document.getElementById('join-hint').textContent = '';
+  document.getElementById('modal-join').classList.add('show');
+}
+
+async function submitJoinRequest() {
+  const name = document.getElementById('join-name').value.trim();
+  const email = document.getElementById('join-email').value.trim().toLowerCase();
+  const phone = document.getElementById('join-phone').value.trim();
+  const message = document.getElementById('join-message').value.trim();
+  const hint = document.getElementById('join-hint');
+
+  if (!name || !email || !email.includes('@')) {
+    hint.textContent = 'الاسم والبريد الإلكتروني مطلوبان';
+    hint.style.color = '#F2829A';
+    return;
+  }
+
+  hint.textContent = 'جاري الإرسال...';
+  hint.style.color = '#8DA2AA';
+
+  const r = await apiPost({action: 'addJoinRequest', data: {name, email, phone, message, date: new Date().toISOString().split('T')[0]}});
+
+  if (r.error) {
+    hint.textContent = 'خطأ: ' + r.error;
+    hint.style.color = '#F2829A';
+    return;
+  }
+
+  closeModal('modal-join');
+  // Show success message on login page
+  const emailHint = document.getElementById('email-hint');
+  emailHint.textContent = '✓ تم إرسال طلبك! سيتواصل معك الأدمن قريباً';
+  emailHint.style.color = '#4FE0AB';
+}
+
+async function loadJoinRequests() {
+  const result = await api('getJoinRequests');
+  const list = document.getElementById('requests-list');
+  const badge = document.getElementById('requests-badge');
+  if (!list) return;
+
+  const rows = result.rows || [];
+  const pending = rows.filter(r => r.status === 'pending');
+
+  // Update badge
+  if (badge) {
+    if (pending.length > 0) {
+      badge.textContent = pending.length;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  if (!rows.length) {
+    list.innerHTML = '<div style="color:#8DA2AA;text-align:center;padding:30px">لا توجد طلبات انضمام</div>';
+    return;
+  }
+
+  list.innerHTML = '<div class="card-title" style="margin-bottom:16px">طلبات الانضمام (' + rows.length + ')</div>' +
+    rows.map(r => {
+      const isPending = r.status === 'pending' || !r.status;
+      return `<div class="member-row">
+        <span class="status-dot ${isPending ? 'active' : 'inactive'}" style="background:${isPending?'#EF9F27':'#8DA2AA'}"></span>
+        <div class="member-info">
+          <div class="member-name">${r.name} ${isPending ? '<span style="font-size:10px;color:#EF9F27;border:1px solid rgba(239,159,39,.3);padding:2px 6px;border-radius:99px">جديد</span>' : ''}</div>
+          <div class="member-email">${r.email} ${r.phone?'· '+r.phone:''} · ${r.date||''}</div>
+          ${r.message ? `<div style="font-size:12px;color:#8DA2AA;margin-top:3px">💬 ${r.message}</div>` : ''}
+        </div>
+        ${isPending ? `
+        <div style="display:flex;gap:6px">
+          <button class="btn-action" style="padding:7px 14px;font-size:12px;margin-top:0" onclick="acceptJoinRequest('${r.id}','${r.name}','${r.email}')">قبول</button>
+          <button class="btn-danger" onclick="rejectJoinRequest('${r.id}')">رفض</button>
+        </div>` : `<span style="font-size:12px;color:#8DA2AA">${r.status==='accepted'?'✓ مقبول':'✗ مرفوض'}</span>`}
+      </div>`;
+    }).join('');
+}
+
+async function acceptJoinRequest(requestId, name, email) {
+  // Pre-fill add member form with request data
+  showSection('a', 'members', document.querySelectorAll('#page-admin .sb-item')[1]);
+  toggleAddMember();
+  document.getElementById('new-name').value = name;
+  document.getElementById('new-email').value = email;
+  document.getElementById('new-date').value = new Date().toISOString().split('T')[0];
+  showToast(`جاهز لإضافة ${name} — أكمل البيانات`);
+  // Mark as accepted
+  await apiPost({action: 'updateJoinRequest', requestId, status: 'accepted'});
+  loadJoinRequests();
+}
+
+async function rejectJoinRequest(requestId) {
+  const r = await apiPost({action: 'updateJoinRequest', requestId, status: 'rejected'});
+  if (r.error) { showToast('خطأ: ' + r.error); return; }
+  showToast('تم رفض الطلب');
+  loadJoinRequests();
+}
+
+// ════════════════════════════════════════
+//  الرسم البياني
+// ════════════════════════════════════════
+let mPerfChart = null, aPerfChart = null;
+
+function buildChartData() {
+  // جمع الصفقات المغلقة مرتبة بالتاريخ
+  const closed = [
+    ...allStocks.filter(r => r.status === 'closed').map(r => ({date: r.closeDate || r.date, pnl: Number(r.pnl || 0)})),
+    ...allOptions.filter(r => r.status === 'closed').map(r => ({date: r.closeDate || r.date, pnl: Number(r.pnl || 0)}))
+  ].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  if (!closed.length) return null;
+
+  // أرباح تراكمية
+  let cumulative = 0;
+  const labels = [];
+  const data = [];
+  closed.forEach(t => {
+    cumulative += t.pnl;
+    labels.push(t.date);
+    data.push(cumulative);
+  });
+
+  return { labels, data };
+}
+
+function renderChart(canvasId, emptyId) {
+  const chartData = buildChartData();
+  const canvas = document.getElementById(canvasId);
+  const empty = document.getElementById(emptyId);
+  if (!canvas) return;
+
+  if (!chartData || chartData.data.length === 0) {
+    canvas.style.display = 'none';
+    if (empty) empty.style.display = 'flex';
+    return;
+  }
+
+  canvas.style.display = 'block';
+  if (empty) empty.style.display = 'none';
+
+  const isPositive = chartData.data[chartData.data.length - 1] >= 0;
+  const color = isPositive ? '#4FE0AB' : '#F2829A';
+
+  // destroy existing
+  if (canvasId === 'm-perf-chart' && mPerfChart) { mPerfChart.destroy(); mPerfChart = null; }
+  if (canvasId === 'a-perf-chart' && aPerfChart) { aPerfChart.destroy(); aPerfChart = null; }
+
+  const chart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: chartData.labels,
+      datasets: [{
+        data: chartData.data,
+        borderColor: color,
+        backgroundColor: color + '18',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4,
+        pointRadius: chartData.data.length <= 10 ? 4 : 2,
+        pointBackgroundColor: color,
+        pointBorderColor: '#091317',
+        pointBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => (ctx.parsed.y >= 0 ? '+' : '') + Number(ctx.parsed.y).toLocaleString('ar-SA') + ' ر.س'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8DA2AA', font: { size: 10 }, maxTicksLimit: 6 },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          ticks: {
+            color: '#8DA2AA', font: { size: 10 },
+            callback: v => (v >= 0 ? '+' : '') + Number(v).toLocaleString('ar-SA')
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        }
+      }
+    }
+  });
+
+  if (canvasId === 'm-perf-chart') mPerfChart = chart;
+  if (canvasId === 'a-perf-chart') aPerfChart = chart;
+}
+
 function safeSet(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
 function showToast(msg) {
   const t=document.getElementById('toast'); t.textContent=msg;
