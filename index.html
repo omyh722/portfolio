@@ -190,7 +190,10 @@ tbody td{padding:13px 8px;color:#C3D2D7}
   .personal-grid{grid-template-columns:1fr}
   .form-grid{grid-template-columns:1fr}
   .login-card{padding:28px 20px}
-  .pin-key{padding:13px 6px;font-size:20px}
+  .pin-key{padding:18px 6px;font-size:26px;border-radius:16px}
+  .pin-grid{gap:12px;margin-bottom:16px}
+  .pin-dots{gap:16px;margin-bottom:28px}
+  .pin-dot{width:16px;height:16px}
   .modal{margin:10px;padding:20px}
   table{font-size:12px}
   thead td{padding:10px 6px}
@@ -690,10 +693,25 @@ function backToEmail() {
 
 document.getElementById('email-input').addEventListener('keydown', e => { if(e.key==='Enter') submitEmail(); });
 
-// تذكر الإيميل
+// تذكر الإيميل - تخطي خطوة الإيميل إذا محفوظ
 const savedEmail = localStorage.getItem('savedEmail');
 if (savedEmail) {
   document.getElementById('email-input').value = savedEmail;
+  // تحقق تلقائي من الإيميل المحفوظ
+  setTimeout(async () => {
+    const result = await api('findByEmail', {email: savedEmail});
+    if (result.found && result.user.status === 'active') {
+      pendingUser = result.user;
+      pendingEmail = savedEmail;
+      document.getElementById('badge-av').textContent = result.user.name?.slice(0,1) || 'م';
+      document.getElementById('badge-name').textContent = result.user.name;
+      document.getElementById('badge-email').textContent = savedEmail;
+      document.getElementById('user-badge').style.display = 'flex';
+      document.getElementById('step-email').classList.remove('active');
+      document.getElementById('step-pin').classList.add('active');
+      document.getElementById('pin-hint').textContent = 'أدخل رمزك السري';
+    }
+  }, 300);
 }
 
 // ════════════════════════════════════════
